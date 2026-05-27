@@ -31,8 +31,7 @@ class Scara:
 
         x = self.L1 * math.cos(axisX) + self.L2 * math.cos(axisX + axisY)
         y = self.L1 * math.sin(axisX) + self.L2 * math.sin(axisX + axisY)
-        z = self.L3 + self.acsAxisZ.Sollposition
-
+        z = self.L3 + axisZ
         r = self.acsAxisX.Sollposition + self.acsAxisY.Sollposition + self.acsAxisR.Sollposition
 
         return x, y, z, r
