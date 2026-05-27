@@ -59,7 +59,6 @@ class RobotViewer:
         """
         # Setze die Orientierung [X, Y, Z] für die jeweiligen Bauteile
         self.inner_arm_actor.orientation = [0, 0, inner_angle]
-        
         self.outer_arm_actor.orientation = [0, 0, outer_angle]
         self.spindle_actor.orientation = [0, 0, spindle_angle]
         
@@ -75,5 +74,3 @@ class RobotViewer:
 
 robot = RobotViewer()
 robot.show()     
-
-robot.update_joints(inner_angle=10, outer_angle=10, spindle_angle=10)
