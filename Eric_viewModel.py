@@ -15,8 +15,7 @@ pl.renderer.SetMaximumNumberOfPeels(0)
 base  = pl.add_mesh(BaseMesh,     color="lightgray")
 actor = pl.add_mesh(InnerArmMesh, color="orange")
 
-# ✅ Drehpunkt = Gelenk wo Arm mit Basis verbunden ist
-# → Werte aus dem print() oben anpassen!
+
 gelenk_x = 0    # <-- anpassen
 gelenk_y = 0    # <-- anpassen
 gelenk_z = 0    # <-- anpassen
