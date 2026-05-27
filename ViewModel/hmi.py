@@ -13,10 +13,10 @@ root.minsize(400, 400)
 links = 10
 rechts = 250
 mitte = 200
-unten= 350
+oben = 10
+unten = 350
 
-tk.Label(root, text="Roboter Steuerung").pack()
-
+Titel = tk.Label(root, text="Roboter Steuerung").pack()
 
 button1 = tk.Button(root, text="Stop", activebackground="red", width=25, command=root.destroy)
 button1.pack()
@@ -67,16 +67,15 @@ combo_box.place(x=rechts, y= 40)
 
 # Achse
 
-tk.Label(root, text="X")
-tk.Label(root, text="Y")
-tk.Label(root, text="Z")
-tk.Label(root, text="R")
+Label1 = tk.Label(root, text="X")
+Label2 = tk.Label(root, text="Y")
+Label3 = tk.Label(root, text="Z")
+Label4 = tk.Label(root, text="R")
 
-
-
-
-
-
+Label1.place(x=links, y=100)
+Label2.place(x=links, y=125)
+Label3.place(x=links, y=150)
+Label4.place(x=links, y=175)
 
 
 
