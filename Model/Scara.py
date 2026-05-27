@@ -18,22 +18,22 @@ class Scara:
         self.mcsAxisR = Axis()
 
     def setAxesJoint(self, axis1, axis2, axis3, axis4):
-        self.acsAxis1.Sollposition = axis1
-        self.acsAxis2.Sollposition = axis2
-        self.acsAxis3.Sollposition = axis3
-        self.acsAxis4.Sollposition = axis4
+        self.acsAxisX.Sollposition = axis1
+        self.acsAxisY.Sollposition = axis2
+        self.acsAxisZ.Sollposition = axis3
+        self.acsAxisR.Sollposition = axis4
 
     def forward(self):
-        axis1 = math.radians(self.acsAxis1.Sollposition)
-        axis2 = math.radians(self.acsAxis2.Sollposition)
-        axis3 = self.acsAxis3.Sollposition
-        axis4 = math.radians(self.acsAxis4.Sollposition)
+        axisX = math.radians(self.acsAxisX.Sollposition)
+        axisY = math.radians(self.acsAxisY.Sollposition)
+        axisZ = self.acsAxisZ.Sollposition
+        axisR = math.radians(self.acsAxisR.Sollposition)
 
-        x = self.L1 * math.cos(axis1) + self.L2 *math.cos(axis1 + axis2)
-        y = self.L1 * math.sin(axis1) + self.L2 *math.sin(axis1 + axis2)
-        z = self.L3 + self.acsAxis3.Sollposition
+        x = self.L1 * math.cos(axisX) + self.L2 * math.cos(axisX + axisY)
+        y = self.L1 * math.sin(axisX) + self.L2 * math.sin(axisX + axisY)
+        z = self.L3 + self.acsAxisZ.Sollposition
 
-        r = self.acsAxis1.Sollposition + self.acsAxis2.Sollposition + self.acsAxis4.Sollposition
+        r = self.acsAxisX.Sollposition + self.acsAxisY.Sollposition + self.acsAxisR.Sollposition
 
         return x, y, z, r
 
