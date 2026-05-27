@@ -24,14 +24,16 @@ class Scara:
         self.acsAxis4.Sollposition = axis4
 
     def forward(self):
-        axis1 = math.radians(self.axis1_deg)
-        axis2 = math.radians(self.axis2_deg)
+        axis1 = math.radians(self.acsAxis1.Sollposition)
+        axis2 = math.radians(self.acsAxis2.Sollposition)
+        axis3 = self.acsAxis3.Sollposition
+        axis4 = math.radians(self.acsAxis4.Sollposition)
 
         x = self.L1 * math.cos(axis1) + self.L2 *math.cos(axis1 + axis2)
         y = self.L1 * math.sin(axis1) + self.L2 *math.sin(axis1 + axis2)
-        z = self.L3 + self.axis3_mm
+        z = self.L3 + self.acsAxis3.Sollposition
 
-        r = self.axis1_deg + self.axis2_deg + self.axis4_deg
+        r = self.acsAxis1.Sollposition + self.acsAxis2.Sollposition + self.acsAxis4.Sollposition
 
         return x, y, z, r
 
