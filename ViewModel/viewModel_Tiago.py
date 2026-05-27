@@ -71,3 +71,7 @@ class RobotViewer:
         Schließt das PyVista Fenster sauber.
         """
         self.pl.close()
+
+
+robot = RobotViewer()
+robot.show()        
