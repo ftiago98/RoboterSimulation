@@ -1,41 +1,71 @@
 import os
+from Axis import Axis
 
-class HBot:
+class CoreXY:
     def __init__(self):
-        self.X = 0
-        self.Y = 0
-        self.MotorA = 0
-        self.MotorB = 0
+        self.axis_a = Axis()
+        self.axis_b = Axis()
+        self.x = 0
+        self.y = 0
 
-    def inverse(self, target_x, target_y):
+    def inverse(self,x, y):
 
-        a = target_x + target_y
-        b = target_x - target_y
-        return a, b
+        motor_a = x + y
+        motor_b = x - y
 
-    def forward(self, pos_a, pos_b):
+        return motor_a, motor_b
 
-            x = (pos_a + pos_b) / 2.0
-            y = (pos_a - pos_b) / 2.0
-            return x, y
+    def forward(self, motor_a, motor_b):
 
-    def move_to(self, target_x, target_y):
-            print(f"Command: Move to X={target_x}, Y={target_y}")
-            
-            self.motor_a, self.motor_b = self.inverse(target_x, target_y)
-            self.x = target_x
-            self.y = target_y
+        x = (motor_a + motor_b) / 2.0
+        y = (motor_a - motor_b) / 2.0
+
+        return x, y
+
+    def move_to(self, x, y):
+
+        print(f"\nMove command -> X:{x} Y:{y}")
+
+        # Convert XY to motor coordinates
+        motor_a, motor_b = self.inverse(x, y)
+
+        # Write target positions into axis objects
+        self.axis_a.Sollposition = motor_a
+        self.axis_b.Sollposition = motor_b
+
+        # Simulate movement
+        self.axis_a.ActualPosition = motor_a
+        self.axis_b.ActualPosition = motor_b
+
+        # Update XY position
+        self.x = x
+        self.y = y
 
     def get_actual_position(self):
-            """Calculates current XY position based strictly on motor state."""
-            return self.forward(self.motor_a, self.motor_b)
+
+        motor_a = self.axis_a.getActualPosition()
+        motor_b = self.axis_b.getActualPosition()
+
+        return self.forward(motor_a, motor_b)
+    
+    def status(self):
+
+        print("\n--- COREXY STATUS ---")
+
+        print(f"Motor A Actual: {self.axis_a.ActualPosition}")
+        print(f"Motor B Actual: {self.axis_b.ActualPosition}")
+
+        x, y = self.get_actual_position()
+
+        print(f"Calculated X: {x}")
+        print(f"Calculated Y: {y}")
 
 # --- Test the Transformation ---
-bot = HBot()
+bot = CoreXY()
 
-# Move the bot to X=10, Y=5
-bot.move_to(int(input("Enter a value for X: ")),int(input("Enter a value for Y: ")))
+target_x = int(input("Enter X: "))
+target_y = int(input("Enter Y: "))
 
-print(f"Motor Positions -> A: {bot.motor_a}, B: {bot.motor_b}")
-print(f"Calculated XY   -> {bot.get_actual_position()}")
+bot.move_to(target_x, target_y)
 
+bot.status()
