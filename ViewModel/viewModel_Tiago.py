@@ -1,5 +1,6 @@
 import pyvista as pv
 import os
+import vtk  # WICHTIG: VTK importieren für die kinematischen Verknüpfungen
 
 class RobotViewer:
     """
@@ -9,7 +10,6 @@ class RobotViewer:
     
     def __init__(self, data_folder_path=None):
         # 1. Pfade konfigurieren
-        # Wenn kein Pfad übergeben wird, nutze den Standardpfad (cwd/View/data)
         if data_folder_path is None:
             cwd = os.getcwd()
             data_folder_path = os.path.join(cwd, "View", "data")
@@ -28,18 +28,20 @@ class RobotViewer:
         # 3. Plotter und Szene aufbauen
         self.pl = pv.Plotter()
 
-        # Wir speichern die 'Actors' als Attribute der Klasse (self.xyz), 
-        # damit wir später in anderen Methoden darauf zugreifen können.
         self.base_actor = self.pl.add_mesh(base_mesh, color="lightblue")
         self.inner_arm_actor = self.pl.add_mesh(inner_arm_mesh, color="orange")
         self.outer_arm_actor = self.pl.add_mesh(outer_arm_mesh, color="green")
         self.spindle_actor = self.pl.add_mesh(spindle_mesh, color="gray")
 
+        # 4. Koordinaten der Drehpunkte aus dem CAD-Programm
+        self.origin_inner = (0.0, 0, 0)
+        self.origin_outer = (-325.0, 0.0, 0.0)
+        self.origin_spindle = (-550.0, 0.0, 0.0)
 
-        # 4. Verschiebungen zu Kordinatenpunkt (0/0/0) wurde aus CAD Programm übernommen
-        self.inner_arm_actor.origin = (0.0, 100.0, 50.0)
-        self.outer_arm_actor.origin = (-325.0, 0.0, 0.0)
-        self.spindle_actor.origin = (-550, 0.0, 0.0)
+        # Setze die PyVista Origins (unterstützt die korrekte visuelle Darstellung)
+        self.inner_arm_actor.origin = self.origin_inner
+        self.outer_arm_actor.origin = self.origin_outer
+        self.spindle_actor.origin = self.origin_spindle
 
         # 5. Kamera einstellen
         self.pl.camera_position = [
@@ -47,6 +49,21 @@ class RobotViewer:
             (0.0, 0.0, 0.0),        # Fokuspunkt
             (0.0, 1.0, 0.0)         # Oben-Vektor
         ]
+
+    def _create_rotation(self, origin, angle):
+        """
+        Hilfsmethode: Erstellt eine VTK-Transformation für die Drehung
+        um einen bestimmten Punkt (origin) auf der Z-Achse.
+        """
+        transform = vtk.vtkTransform()
+        transform.PostMultiply()
+        
+        # Verschieben zum Nullpunkt -> Drehen -> Zurückschieben
+        transform.Translate(-origin[0], -origin[1], -origin[2])
+        transform.RotateZ(angle) 
+        transform.Translate(origin[0], origin[1], origin[2])
+        
+        return transform
 
     def show(self):
         """
@@ -56,20 +73,27 @@ class RobotViewer:
 
     def update_joints(self, inner_angle=0, outer_angle=0, spindle_angle=0):
         """
-        Aktualisiert die Position der Roboterarme und zeichnet das Bild neu.
-        
-        Parameter:
-        - inner_angle: Drehung des inneren Arms (Z-Achse)
-        - outer_angle: Drehung des äußeren Arms (Z-Achse)
-        - spindle_angle: Drehung der Spindel (Z-Achse)
+        Aktualisiert die Position der Roboterarme durch kinematische Verknüpfung.
         """
-        # Setze die Orientierung [X, Y, Z] für die jeweiligen Bauteile
-        self.inner_arm_actor.orientation = [0, 0, inner_angle]
-        self.outer_arm_actor.orientation = [0, 0, outer_angle]
-        self.spindle_actor.orientation = [0, 0, spindle_angle]
-        
+        # --- 1. Innerer Arm ---
+        t_inner = self._create_rotation(self.origin_inner, inner_angle)
+        self.inner_arm_actor.SetUserTransform(t_inner)
 
-        # Zwingt PyVista, das Bild mit der neuen Position neu zu zeichnen
+        # --- 2. Äußerer Arm (Kind vom inneren Arm) ---
+        t_outer = vtk.vtkTransform()
+        t_outer.PostMultiply()
+        t_outer.Concatenate(self._create_rotation(self.origin_outer, outer_angle))
+        t_outer.Concatenate(t_inner) # Hier wird die Bewegung verknüpft!
+        self.outer_arm_actor.SetUserTransform(t_outer)
+
+        # --- 3. Spindel (Kind vom äußeren Arm) ---
+        t_spindle = vtk.vtkTransform()
+        t_spindle.PostMultiply()
+        t_spindle.Concatenate(self._create_rotation(self.origin_spindle, spindle_angle))
+        t_spindle.Concatenate(t_outer) # Verknüpfung mit dem äußeren Arm
+        self.spindle_actor.SetUserTransform(t_spindle)
+
+        # Zwingt PyVista, das Bild neu zu zeichnen
         self.pl.update()
         
     def close(self):
@@ -79,5 +103,17 @@ class RobotViewer:
         self.pl.close()
 
 
-robot = RobotViewer()
-robot.show()     
+# --- Test-Aufruf ---
+if __name__ == "__main__":
+    import time
+    robot = RobotViewer()
+    robot.show()
+    
+    # Kurzer Test, um zu sehen, ob die Spindel mitfährt
+    print("Starte kurzen Bewegungstest...")
+    for i in range(100):
+        # Drehe den inneren Arm und den äußeren Arm gleichzeitig
+        robot.update_joints(inner_angle=i, outer_angle=-i*0.5, spindle_angle=i*2)
+        time.sleep(0.05)
+        
+    print("Test beendet.")
