@@ -7,21 +7,21 @@ class Scara:
         self.L2 = 225
         self.L3 = 0
 
-        self.axis1 = Axis()
-        self.axis2 = Axis()
-        self.axis3 = Axis()
-        self.axis4 = Axis()
+        self.acsAxis1 = Axis() # Joint axes
+        self.acsAxis2 = Axis()
+        self.acsAxis3 = Axis()
+        self.acsAxis4 = Axis()
 
-        self.axis1_deg = 0
-        self.axis2_deg = 0
-        self.axis3_mm = 0
-        self.axis4_deg = 0
+        self.mcsAxisX = Axis() #World axes
+        self.mcsAxisY = Axis()
+        self.mcsAxisZ = Axis()
+        self.mcsAxisR = Axis()
 
-    def setAxes(self, axis1, axis2, axis3, axis4):
-        self.axis1_deg = axis1
-        self.axis2_deg = axis2
-        self.axis3_mm = axis3
-        self.axis4_deg = axis4
+    def setAxesJoint(self, axis1, axis2, axis3, axis4):
+        self.acsAxis1.Sollposition = axis1
+        self.acsAxis2.Sollposition = axis2
+        self.acsAxis3.Sollposition = axis3
+        self.acsAxis4.Sollposition = axis4
 
     def forward(self):
         axis1 = math.radians(self.axis1_deg)
@@ -37,7 +37,7 @@ class Scara:
 
 
 robot = Scara()
-robot.setAxes(30, 45, 50, 90)
+robot.setAxesJoint(30, 45, 50, 90)
 position = robot.forward()
 print(position)
 
