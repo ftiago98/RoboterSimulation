@@ -74,4 +74,6 @@ class RobotViewer:
 
 
 robot = RobotViewer()
-robot.show()        
+robot.show()     
+
+robot.update_joints(inner_angle=10, outer_angle=10, spindle_angle=10)
