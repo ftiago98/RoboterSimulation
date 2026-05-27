@@ -39,8 +39,12 @@ class CNCInterpreter:
             self._parse_line(line, line_number)
 
     def _clean_line(self, line: str) -> str:
+        # Kommentare mit ; entfernen
         line = line.split(";")[0]
+
+        # Kommentare in Klammern entfernen
         line = re.sub(r"\(.*?\)", "", line)
+
         return line.strip().upper()
 
     def _parse_line(self, line: str, line_number: int):
@@ -127,36 +131,117 @@ class CNCInterpreter:
     def get_moves(self):
         return self.moves
 
+    def export_robot_path(
+        self,
+        default_rapid_speed=3000,
+        default_linear_speed=1000,
+        default_blend=2.0
+    ):
+        robot_path = []
+
+        for index, move in enumerate(self.moves, start=1):
+            end = move["end"]
+
+            # Geschwindigkeit bestimmen
+            if move["feedrate"] is not None:
+                speed = move["feedrate"]
+            elif move["type"] == "rapid":
+                speed = default_rapid_speed
+            else:
+                speed = default_linear_speed
+
+            robot_point = {
+                "point_number": index,
+                "x": end["X"],
+                "y": end["Y"],
+                "z": end["Z"],
+                "speed": speed,
+                "blend": default_blend,
+                "move_type": move["type"]
+            }
+
+            robot_path.append(robot_point)
+
+        return robot_path
+
 
 # -------------------------
-# TEST 1: G-Code als String
+# HAUPTPROGRAMM
 # -------------------------
 
-gcode_string = """
-G90
-G0 X0 Y0 Z5
-G1 X10 Y0 F1000
-G1 X10 Y10
-G1 X0 Y10
-G1 X0 Y0
-"""
+print("CNC Interpreter gestartet")
+print("------------------------")
 
 cnc = CNCInterpreter()
-cnc.load_from_string(gcode_string)
 
-print("Bewegungen aus String:")
-for move in cnc.get_moves():
-    print(move)
+# programm.nc muss im gleichen Ordner liegen wie diese Python-Datei
+datei_pfad = Path(__file__).parent / "programm.nc"
+
+print("Ich lese diese Datei:")
+print(datei_pfad)
+
+print("\nInhalt der Datei:")
+print(datei_pfad.read_text(encoding="utf-8"))
+
+cnc.load_from_path(datei_pfad)
 
 
 # -------------------------
-# TEST 2: G-Code aus Datei
+# BEWEGUNGEN AUSGEBEN
 # -------------------------
 
 print("\nBewegungen aus Datei:")
 
-cnc2 = CNCInterpreter()
-cnc2.load_from_path("programm.nc")
+for move in cnc.get_moves():
+    start = move["start"]
+    end = move["end"]
 
-for move in cnc2.get_moves():
-    print(move)
+    print(
+        f"Zeile {move['line']}: "
+        f"{move['type']} von "
+        f"X{start['X']} Y{start['Y']} Z{start['Z']} nach "
+        f"X{end['X']} Y{end['Y']} Z{end['Z']} "
+        f"mit F{move['feedrate']}"
+    )
+
+
+# -------------------------
+# ROBOTER-PFAD EXPORTIEREN
+# -------------------------
+
+print("\nRoboter-Pfad 3D mit Geschwindigkeit und Verschleifpunkt:")
+
+robot_path = cnc.export_robot_path(
+    default_rapid_speed=3000,
+    default_linear_speed=1000,
+    default_blend=2.0
+)
+
+for point in robot_path:
+    print(
+        f"P{point['point_number']}: "
+        f"X={point['x']}, "
+        f"Y={point['y']}, "
+        f"Z={point['z']}, "
+        f"Speed={point['speed']}, "
+        f"Blend={point['blend']}, "
+        f"Typ={point['move_type']}"
+    )
+
+
+# -------------------------
+# ROBOTER-BEFEHLE AUSGEBEN
+# -------------------------
+
+print("\nRoboter-Befehle:")
+
+for point in robot_path:
+    print(
+        f"move_to("
+        f"{point['x']}, "
+        f"{point['y']}, "
+        f"{point['z']}, "
+        f"speed={point['speed']}, "
+        f"blend={point['blend']}"
+        f")"
+    )
