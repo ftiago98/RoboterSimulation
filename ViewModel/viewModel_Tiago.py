@@ -35,7 +35,13 @@ class RobotViewer:
         self.outer_arm_actor = self.pl.add_mesh(outer_arm_mesh, color="green")
         self.spindle_actor = self.pl.add_mesh(spindle_mesh, color="gray")
 
-        # 4. Kamera einstellen
+
+        # 4. Verschiebungen zu Koordinatien 0
+        self.inner_arm_actor.origin = (0.0, 100.0, 50.0)
+        self.outer_arm_actor.origin = (-325.0, 0.0, 0.0)
+        self.spindle_actor.origin = (-550, 0.0, 0.0)
+
+        # 5. Kamera einstellen
         self.pl.camera_position = [
             (0.0, -1500.0, 850.0),  # Position der Kamera
             (0.0, 0.0, 0.0),        # Fokuspunkt
@@ -62,6 +68,7 @@ class RobotViewer:
         self.outer_arm_actor.orientation = [0, 0, outer_angle]
         self.spindle_actor.orientation = [0, 0, spindle_angle]
         
+
         # Zwingt PyVista, das Bild mit der neuen Position neu zu zeichnen
         self.pl.update()
         
