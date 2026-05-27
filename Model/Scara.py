@@ -6,7 +6,7 @@ class Scara:
         self.L2 = 225
         self.L3 = 0
 
-        self.axis1 = 000
+        self.axis1 = 0
         self.axis2 = 0
         self.axis3 = 0
         self.axis4 = 0
