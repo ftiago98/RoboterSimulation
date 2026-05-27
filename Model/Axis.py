@@ -11,4 +11,3 @@ class Axis:
 
 testaxis = Axis()
 print (testaxis.getActualPosition())
-
