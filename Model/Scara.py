@@ -11,10 +11,10 @@ class Scara:
         self.axis3 = 0
         self.axis4 = 0
 
-    self.axis1_deg = 0
-    self.axis2_deg = 0
-    self.axis3_mm = 0
-    self.axis4_deg = 0
+        self.axis1_deg = 0
+        self.axis2_deg = 0
+        self.axis3_mm = 0
+        self.axis4_deg = 0
 
     def setAxes(self, axis1, axis2, axis3, axis4):
         self.axis1_deg = axis1
@@ -41,7 +41,3 @@ position = robot.forward()
 print(position)
 
    
-   
-        
-
-    
