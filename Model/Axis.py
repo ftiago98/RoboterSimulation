@@ -2,7 +2,7 @@ import os
 
 class Axis:
     def __init__(self):
-        self.ActualPosition = 10
+        self.ActualPosition = 0
         self.Sollposition = 0
     
     def getActualPosition(self):
