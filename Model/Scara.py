@@ -3,8 +3,8 @@ import Axis
 
 class Scara:
     def __init__(self):
-        self.L1 = 225
-        self.L2 = 225
+        self.L1 = -325,0,0
+        self.L2 = -550,0,0
         self.L3 = 0
 
         self.acsAxis1 = Axis() # Joint axes
