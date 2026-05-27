@@ -1,4 +1,5 @@
 import math
+import Axis
 
 class Scara:
     def __init__(self):
@@ -6,10 +7,10 @@ class Scara:
         self.L2 = 225
         self.L3 = 0
 
-        self.axis1 = 0
-        self.axis2 = 0
-        self.axis3 = 0
-        self.axis4 = 0
+        self.axis1 = Axis()
+        self.axis2 = Axis()
+        self.axis3 = Axis()
+        self.axis4 = Axis()
 
         self.axis1_deg = 0
         self.axis2_deg = 0
