@@ -5,7 +5,7 @@ import vtk  # WICHTIG: VTK importieren für die kinematischen Verknüpfungen
 class RobotViewer:
     """
     Diese Klasse lädt die 3D-Modelle des Roboters und stellt ein Fenster
-    zur Verfügung, um den Roboter von außen zu steuern.
+    zur Verfügung, um den Roboter von aussen zu steuern.
     """
     
     def __init__(self, data_folder_path=None):
@@ -79,18 +79,18 @@ class RobotViewer:
         t_inner = self._create_rotation(self.origin_inner, inner_angle)
         self.inner_arm_actor.SetUserTransform(t_inner)
 
-        # --- 2. Äußerer Arm (Kind vom inneren Arm) ---
+        # --- 2. Äusserer Arm (Kind vom inneren Arm) ---
         t_outer = vtk.vtkTransform()
         t_outer.PostMultiply()
         t_outer.Concatenate(self._create_rotation(self.origin_outer, outer_angle))
         t_outer.Concatenate(t_inner) # Hier wird die Bewegung verknüpft!
         self.outer_arm_actor.SetUserTransform(t_outer)
 
-        # --- 3. Spindel (Kind vom äußeren Arm) ---
+        # --- 3. Spindel (Kind vom äusseren Arm) ---
         t_spindle = vtk.vtkTransform()
         t_spindle.PostMultiply()
         t_spindle.Concatenate(self._create_rotation(self.origin_spindle, spindle_angle))
-        t_spindle.Concatenate(t_outer) # Verknüpfung mit dem äußeren Arm
+        t_spindle.Concatenate(t_outer) # Verknüpfung mit dem äusseren Arm
         self.spindle_actor.SetUserTransform(t_spindle)
 
         # Zwingt PyVista, das Bild neu zu zeichnen
@@ -98,7 +98,7 @@ class RobotViewer:
         
     def close(self):
         """
-        Schließt das PyVista Fenster sauber.
+        Schliesst das PyVista Fenster sauber.
         """
         self.pl.close()
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     # Kurzer Test, um zu sehen, ob die Spindel mitfährt
     print("Starte kurzen Bewegungstest...")
     for i in range(100):
-        # Drehe den inneren Arm und den äußeren Arm gleichzeitig
+        # Drehe den inneren Arm und den äusseren Arm gleichzeitig
         robot.update_joints(inner_angle=i, outer_angle=-i*0.5, spindle_angle=i*2)
         time.sleep(0.05)
         
