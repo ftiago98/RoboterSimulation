@@ -36,7 +36,7 @@ class RobotViewer:
         self.spindle_actor = self.pl.add_mesh(spindle_mesh, color="gray")
 
 
-        # 4. Verschiebungen zu Koordinatien 0
+        # 4. Verschiebungen zu Kordinatenpunkt (0/0/0) wurde aus CAD Programm übernommen
         self.inner_arm_actor.origin = (0.0, 100.0, 50.0)
         self.outer_arm_actor.origin = (-325.0, 0.0, 0.0)
         self.spindle_actor.origin = (-550, 0.0, 0.0)
