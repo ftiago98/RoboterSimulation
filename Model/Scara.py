@@ -1,5 +1,5 @@
 import math
-import Axis
+from Axis import Axis
 
 class Scara:
     def __init__(self):
