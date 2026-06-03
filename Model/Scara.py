@@ -7,32 +7,32 @@ class Scara:
         self.L2 = 550
         self.L3 = 0
 
-        self.acsAxis1 = Axis() # Joint axes
-        self.acsAxis2 = Axis()
-        self.acsAxis3 = Axis()
-        self.acsAxis4 = Axis()
+        self.acsAxisX = Axis() # Gelenk 1
+        self.acsAxisY = Axis() # Gelenk 2
+        self.acsAxisZ = Axis() # Hubachse
+        self.acsAxisR = Axis() # Werkzeugdrehachse
 
-        self.mcsAxisX = Axis() #World axes
-        self.mcsAxisY = Axis()
-        self.mcsAxisZ = Axis()
-        self.mcsAxisR = Axis()
+        self.mcsAxisX = Axis() # X Achse
+        self.mcsAxisY = Axis() # Y Achse
+        self.mcsAxisZ = Axis() # Z Achse
+        self.mcsAxisR = Axis() # Rotationsachse
 
-    def setAxesJoint(self, axis1, axis2, axis3, axis4):
+    def setAxesJoint(self, axis1, axis2, axis3, axis4): # Gelenkwinkel und Hubhöhe setzen
         self.acsAxisX.Sollposition = axis1
         self.acsAxisY.Sollposition = axis2
         self.acsAxisZ.Sollposition = axis3
         self.acsAxisR.Sollposition = axis4
 
-    def forward(self):
+    def forward(self): # Vorwärtskinematik berechnen # Winkel von Grad in Bogenmaß umrechnen
         axisX = math.radians(self.acsAxisX.Sollposition)
         axisY = math.radians(self.acsAxisY.Sollposition)
-        axisZ = self.acsAxisZ.Sollposition
+        axisZ = self.acsAxisZ.Sollposition # Lineare Bewegung
         axisR = math.radians(self.acsAxisR.Sollposition)
 
-        x = self.L1 * math.cos(axisX) + self.L2 * math.cos(axisX + axisY)
-        y = self.L1 * math.sin(axisX) + self.L2 * math.sin(axisX + axisY)
-        z = self.L3 + axisZ
-        r = self.acsAxisX.Sollposition + self.acsAxisY.Sollposition + self.acsAxisR.Sollposition
+        x = self.L1 * math.cos(axisX) + self.L2 * math.cos(axisX + axisY) # Berechnung der X-Koordinate
+        y = self.L1 * math.sin(axisX) + self.L2 * math.sin(axisX + axisY) # Berechnung der Y-Koordinate
+        z = self.L3 + axisZ # Berechnung der Z-Koordinate
+        r = self.acsAxisX.Sollposition + self.acsAxisY.Sollposition + self.acsAxisR.Sollposition # Berechnung der Rotationsachse
 
         return x, y, z, r
 
