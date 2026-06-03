@@ -7,9 +7,9 @@ import ViewModel.HMI as Hmi
 
 
 if __name__ == "__main__":
-    robot1 = Scara()
-    robot2 = Scara()
-    Cnc = CNC()
+    robot1Trafo = Scara()
+    robot2Trafo = Scara()
+    CncTrafo = CNC()
 
     scaraView = ScaraView()
     cncView = CncView()
