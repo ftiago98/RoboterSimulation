@@ -113,7 +113,7 @@ y_label.config(text="000")
 z_label.config(text="000")
 r_label.config(text="000")
 
-tkinter.messagebox.showerror(title=None, message=None)
+tkinter.messagebox.showerror(title="Achtung!", message="Koordinaten überschneiden sich!")
 
 root.mainloop()
 
