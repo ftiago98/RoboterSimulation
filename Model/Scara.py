@@ -1,5 +1,6 @@
 import math
 from Axis import Axis
+from CncInterpreter import CncInterpreter
 
 class Scara:
     def __init__(self):
