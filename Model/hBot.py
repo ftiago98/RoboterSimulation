@@ -1,7 +1,7 @@
 from Axis import Axis
+from CncInterpreter import CncInterpreter
 
-
-class CoreXY:
+class hBot:
 
     def __init__(self):
 
@@ -13,6 +13,7 @@ class CoreXY:
         self.mcsAxisX = Axis()
         self.mcsAxisY = Axis()
 
+        self.CncInter = CncInterpreter()
     # --------------------------------
     # XY -> Motor coordinates
     # --------------------------------
