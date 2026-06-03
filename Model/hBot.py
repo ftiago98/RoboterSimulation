@@ -87,15 +87,11 @@ if __name__ == "__main__":
     # 1. CNC Datei einlesen und interpretieren
     cnc = CncInterpreter()
     datei_pfad = Path(__file__).parent / "programm.nc"
-    
-    if not datei_pfad.exists():
-        print(f"Fehler: Die Datei {datei_pfad.name} wurde nicht gefunden.")
-    else:
-        cnc.load_from_path(datei_pfad)
-        robot_path = cnc.export_robot_path()
+    robot_path = cnc.export_robot_path()
         
         # 2. Roboter initialisieren
         bot = CoreXY()
+    
         
         # 3. Den extrahierten Pfad an den Roboter übergeben
         for point in robot_path:
