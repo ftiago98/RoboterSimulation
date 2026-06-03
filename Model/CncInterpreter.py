@@ -131,6 +131,39 @@ class CncInterpreter:
     def get_moves(self):
         return self.moves
 
+    def interpolate_path(self, step_size = 10.0): # Pfad in kleine Schritte unterteilen
+        interpolated_moves = []
+
+        for move in self.moves:
+            start = move ["start"]
+            end = move ["end"]
+
+            dx = end["X"] - start["X"]
+            dy = end["Y"] - start["Y"]
+            dz = end["Z"] - start["Z"]
+
+            distance = (dx**2 + dy**2 + dz**2) ** 0.5
+
+            if distance == 0:
+                continue
+
+            steps = max(1, int(distance / step_size)) 
+
+            for step in range(steps + 1):
+                t = step / steps
+
+                point = {
+                    "X": start["X"] + t * dx,
+                    "Y": start["Y"] + t * dy,
+                    "Z": start["Z"] + t * dz,
+                    "move_type": move["type"],
+                    "feedrate": move["feedrate"]
+                }
+    
+                interpolated_moves.append(point)
+
+        return interpolated_moves
+            
     def export_robot_path(
         self,
         default_rapid_speed=3000,
@@ -185,6 +218,12 @@ print(datei_pfad.read_text(encoding="utf-8"))
 
 cnc.load_from_path(datei_pfad)
 
+print ("\nInterpolierter Pfad:")
+
+interpolated_path = cnc.interpolate_path(step_size=10.0)
+
+for point in interpolated_path:
+    print(f"X{point['X']} Y{point['Y']} Z{point['Z']}")
 
 # -------------------------
 # BEWEGUNGEN AUSGEBEN
