@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 
-class CNCInterpreter:
+class CncInterpreter:
     def __init__(self):
         self.position = {
             "X": 0.0,
@@ -172,7 +172,7 @@ class CNCInterpreter:
 print("CNC Interpreter gestartet")
 print("------------------------")
 
-cnc = CNCInterpreter()
+cnc = CncInterpreter()
 
 # programm.nc muss im gleichen Ordner liegen wie diese Python-Datei
 datei_pfad = Path(__file__).parent / "programm.nc"
