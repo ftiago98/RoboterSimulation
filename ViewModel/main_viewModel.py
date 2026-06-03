@@ -1,5 +1,5 @@
 import time
-from viewModel_Tiago import RobotViewer
+from ViewModel.viewScadaRoboter import RobotViewer
 
 def main():
     print("Initialisiere den Roboter...")

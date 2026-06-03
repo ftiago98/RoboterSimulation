@@ -9,5 +9,6 @@ class Axis:
         return self.ActualPosition
 
 
+
 testaxis = Axis()
 print (testaxis.getActualPosition())

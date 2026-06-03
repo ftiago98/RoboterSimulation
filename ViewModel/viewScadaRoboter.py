@@ -8,7 +8,7 @@ und durch Vorwärtskinematik hierarchisch zu animieren.
 
 import pyvista as pv
 import os
-import vtk  # WICHTIG: VTK importieren für die kinematischen Verknüpfungen
+import vtk
 
 class RobotViewer:
     """
