@@ -1,5 +1,5 @@
 from Axis import Axis
-
+import Model.CncInterpreter as CncInterpreter
 
 class CoreXY:
 
@@ -13,6 +13,7 @@ class CoreXY:
         self.mcsAxisX = Axis()
         self.mcsAxisY = Axis()
 
+        self.CncInter = CncInterpreter()
     # --------------------------------
     # XY -> Motor coordinates
     # --------------------------------
@@ -79,6 +80,13 @@ class CoreXY:
 
         print(f"Calculated X: {mcsAxisX}")
         print(f"Calculated Y: {mcsAxisY}")
+
+
+    def Cyclic(self, hmiControl):
+        if hmiControl.OperationMode == 0:
+            if hmiControl.MoveXPlus:
+                self.mcsAxisX += 1
+
 
 
 # --------------------------------

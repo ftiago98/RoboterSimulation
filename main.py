@@ -1,6 +1,6 @@
 import Model.Scara as Scara
 import Model.CoreXY as CNC
-import Model.CncInterpreter
+
 import View.Scara as ScaraView
 import View.CoreXY as CncView
 import ViewModel.HMI as Hmi
