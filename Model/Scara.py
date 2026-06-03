@@ -7,10 +7,10 @@ class Scara:
         self.L2 = 550
         self.L3 = 0
 
-        self.acsAxisX = Axis() # Gelenk 1
-        self.acsAxisY = Axis() # Gelenk 2
-        self.acsAxisZ = Axis() # Hubachse
-        self.acsAxisR = Axis() # Werkzeugdrehachse
+        self.acsAxis1 = Axis() # Gelenk 1
+        self.acsAxis2 = Axis() # Gelenk 2
+        self.acsAxis3 = Axis() # Hubachse
+        self.acsAxis4 = Axis() # Werkzeugdrehachse
 
         self.mcsAxisX = Axis() # X Achse
         self.mcsAxisY = Axis() # Y Achse
