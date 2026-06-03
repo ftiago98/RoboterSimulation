@@ -1,6 +1,6 @@
 import threading
 import Model.Scara as Scara
-import Model.HBot as HBot
+import Model.hBot as hBot
 
 import View.Scara as ScaraView
 import View.HBot as CncView
@@ -18,7 +18,7 @@ def startHmi3():
 if __name__ == "__main__":
     robot1Trafo = Scara()
     robot2Trafo = Scara()
-    CncTrafo = CNC()
+    CncTrafo = hBot()
 
     scaraView = ScaraView()
     cncView = CncView()

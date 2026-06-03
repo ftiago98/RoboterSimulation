@@ -69,16 +69,16 @@ if __name__ == "__main__":
 
     robot = Scara()
 
-robot.setAxesJoint(30, 45, 50, 90)
-position = robot.forward()
-print("Forward:", position)
+    robot.setAxesJoint(30, 45, 50, 90)
+    position = robot.forward()
+    print("Forward:", position)
 
-achsen = robot.backward(position[0], position[1], position[2], position[3])
-print("Backward:", achsen)
+    achsen = robot.backward(position[0], position[1], position[2], position[3])
+    print("Backward:", achsen)
 
-robot.setAxesJoint(achsen[0], achsen[1], achsen[2], achsen[3])
-position2 = robot.forward()
-print("Kontrolle:", position2)
+    robot.setAxesJoint(achsen[0], achsen[1], achsen[2], achsen[3])
+    position2 = robot.forward()
+    print("Kontrolle:", position2)
 
 
    
