@@ -39,6 +39,9 @@ class Scara:
         return x, y, z, r
 
 if __name__ == "__main__":
+    testaxis = Axis()
+    print (testaxis.getActualPosition())
+    
     robot = Scara()
     robot.setAxesJoint(30, 45, 50, 90)
     position = robot.forward()
