@@ -81,12 +81,28 @@ class hBot:
         print(f"Calculated X: {mcsAxisX}")
         print(f"Calculated Y: {mcsAxisY}")
 
-
+if __name__ == "__main__":
+    print("=== CoreXY G-Code Ausführung ===")
+    
+    # 1. CNC Datei einlesen und interpretieren
+    cnc = CncInterpreter()
+    datei_pfad = Path(__file__).parent / "programm.nc"
+    robot_path = cnc.export_robot_path()
+        
+        # 2. Roboter initialisieren
+        bot = CoreXY()
+    
+        
+        # 3. Den extrahierten Pfad an den Roboter übergeben
+        for point in robot_path:
+            # CoreXY nutzt vorerst nur X und Y
+            bot.move_to(point['x'], point['y'])
+            bot.status()
 # --------------------------------
 # TEST
 # --------------------------------
 
-bot = CoreXY()
+bot = hBot()
 
 target_x = int(input("Enter X: "))
 target_y = int(input("Enter Y: "))
