@@ -1,14 +1,37 @@
+"""
+Modul zur 3D-Visualisierung und kinematischen Steuerung eines Roboterarms.
+
+Dieses Modul nutzt `pyvista` und `vtk`, um die STL-Modelle eines mehrgliedrigen 
+Roboters (Basis, innerer Arm, äusserer Arm, Spindel) zu laden, grafisch darzustellen 
+und durch Vorwärtskinematik hierarchisch zu animieren.
+"""
+
 import pyvista as pv
 import os
 import vtk  # WICHTIG: VTK importieren für die kinematischen Verknüpfungen
 
 class RobotViewer:
     """
-    Diese Klasse lädt die 3D-Modelle des Roboters und stellt ein Fenster
-    zur Verfügung, um den Roboter von aussen zu steuern.
+    Lädt die 3D-Modelle des Roboters und stellt eine interaktive Umgebung zur Steuerung bereit.
+
+    Die Klasse baut eine Szene mit PyVista auf und verknüpft die einzelnen Roboterbauteile 
+    hierarchisch (Basis -> Innerer Arm -> Äusserer Arm -> Spindel). Dadurch übertragen sich 
+    die Bewegungen der übergeordneten Glieder automatisch auf die untergeordneten.
+
+    Args:
+        data_folder_path (str, optional): Der absolute oder relative Dateipfad zum Verzeichnis 
+            mit den STL-Dateien ('Base.stl', 'InnerArm.stl', 'OuterArm.stl', 'Spindle.stl'). 
+            Wird `None` übergeben, sucht das Skript standardmässig in './View/data'.
+
+    Attributes:
+        pl (pyvista.Plotter): Das PyVista-Plotter-Objekt für die 3D-Szene.
+        origin_inner (tuple): Der (x, y, z)-Rotationsursprung des inneren Arms.
+        origin_outer (tuple): Der (x, y, z)-Rotationsursprung des äusseren Arms.
+        origin_spindle (tuple): Der (x, y, z)-Rotationsursprung der Spindel.
     """
     
     def __init__(self, data_folder_path=None):
+        """Initialisiert den RobotViewer, lädt die Meshes und konfiguriert die Kamera."""
         # 1. Pfade konfigurieren
         if data_folder_path is None:
             cwd = os.getcwd()
@@ -52,8 +75,17 @@ class RobotViewer:
 
     def _create_rotation(self, origin, angle):
         """
-        Hilfsmethode: Erstellt eine VTK-Transformation für die Drehung
-        um einen bestimmten Punkt (origin) auf der Z-Achse.
+        Hilfsmethode: Erstellt eine VTK-Transformation für die Rotation um die Z-Achse.
+
+        Die Transformation verschiebt das Objekt zunächst in den Nullpunkt, führt die 
+        Rotation aus und schiebt es anschliessend wieder an den ursprünglichen Ort zurück.
+
+        Args:
+            origin (tuple): Die (x, y, z)-Koordinaten des gewünschten Drehpunkts.
+            angle (float): Der Rotationswinkel in Grad.
+
+        Returns:
+            vtk.vtkTransform: Das konfigurierte VTK-Transformationsobjekt.
         """
         transform = vtk.vtkTransform()
         transform.PostMultiply()
@@ -66,14 +98,21 @@ class RobotViewer:
         return transform
 
     def show(self):
-        """
-        Öffnet das Fenster im interaktiven Modus.
-        """
+        """Öffnet das 3D-Fenster im interaktiven Modus, sodass Positionsupdates sichtbar werden."""
         self.pl.show(interactive_update=True)
 
     def update_joints(self, inner_angle=0, outer_angle=0, spindle_angle=0):
         """
-        Aktualisiert die Position der Roboterarme durch kinematische Verknüpfung.
+        Aktualisiert die Gelenkwinkel und berechnet die neue Position der Roboterarme.
+
+        Die Methode wendet Vorwärtskinematik an, indem sie die VTK-Transformationen 
+        verkettet. Der äussere Arm erbt die Rotation des inneren Arms, und die Spindel 
+        erbt die Rotationen beider übergeordneten Arme.
+
+        Args:
+            inner_angle (float, optional): Der Rotationswinkel des inneren Arms in Grad. Standard ist 0.
+            outer_angle (float, optional): Der relative Rotationswinkel des äusseren Arms in Grad. Standard ist 0.
+            spindle_angle (float, optional): Der relative Rotationswinkel der Spindel in Grad. Standard ist 0.
         """
         # --- 1. Innerer Arm ---
         t_inner = self._create_rotation(self.origin_inner, inner_angle)
@@ -97,9 +136,7 @@ class RobotViewer:
         self.pl.update()
         
     def close(self):
-        """
-        Schliesst das PyVista Fenster sauber.
-        """
+        """Schliesst das PyVista-Darstellungsfenster sauber und gibt die Ressourcen frei."""
         self.pl.close()
 
 
