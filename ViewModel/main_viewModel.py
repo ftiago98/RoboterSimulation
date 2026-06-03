@@ -14,9 +14,9 @@ def main():
     
     # 3. Externe Animationsschleife
     for step in range(5000):
-        robot.update_joints(inner_angle=0, outer_angle=0, spindle_angle=step)
+        robot.update_joints(inner_angle=-step, outer_angle=step, spindle_angle=0)
         
-        print(f"Schritt: {step} | Innerer Arm Winkel: {step}")
+        print(f"Schritt: {step} | Äusserer Arm Winkel: {step} | Innerer Arm Winkel: {-step}")
         
         time.sleep(0.2)
         
