@@ -38,7 +38,7 @@ class HBotViewModel:
 # ==========================================
 # 3. VIEW (Angepasst an deine STL-Dateien)
 # ==========================================
-class RobotViewer:
+class HBot:
     """Lädt die 4 spezifischen H-Bot STL-Dateien und steuert deren Bewegung."""
 
     def __init__(self, data_folder_path=None):
@@ -121,7 +121,7 @@ import numpy as np
 # ANWENDUNG STARTEN MIT BEWEGUNGSSCHLAUFE
 # ==========================================
 if __name__ == "__main__":
-    view = RobotViewer()
+    view = HBot()
     model = HBotModel()
     view_model = HBotViewModel(model, view)
 

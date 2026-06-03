@@ -1,10 +1,10 @@
 import threading
 import Model.Scara as Scara
-import Model.CoreXY as CNC
+import Model.HBot as HBot
 
-import View.Scara as Scara
-import View.CoreXY as CncView
-import ViewModel.HMI as Hmi
+import View.Scara as ScaraView
+import View.HBot as CncView
+import ViewModel.hmi as Hmi
 
 
 def startHmi1():
