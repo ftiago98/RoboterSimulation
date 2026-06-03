@@ -10,7 +10,7 @@ import pyvista as pv
 import os
 import vtk
 
-class viewScadaRoboter:
+class Scara:
     """
     Lädt die 3D-Modelle des Roboters und stellt eine interaktive Umgebung zur Steuerung bereit.
 
@@ -143,7 +143,7 @@ class viewScadaRoboter:
 # --- Test-Aufruf ---
 if __name__ == "__main__":
     import time
-    robot = viewScadaRoboter()
+    robot = Scara()
     robot.show()
     
     # Kurzer Test, um zu sehen, ob die Spindel mitfährt

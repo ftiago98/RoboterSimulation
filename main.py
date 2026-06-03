@@ -2,7 +2,7 @@ import threading
 import Model.Scara as Scara
 import Model.CoreXY as CNC
 
-import ViewModel.viewScadaRoboter as viewScadaRoboter
+import View.Scara as Scara
 import View.CoreXY as CncView
 import ViewModel.HMI as Hmi
 
