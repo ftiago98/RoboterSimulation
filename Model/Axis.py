@@ -8,6 +8,6 @@ class Axis:
     def getActualPosition(self):
         return self.ActualPosition
 
-
-testaxis = Axis()
-print (testaxis.getActualPosition())
+if __name__ == "__main__":
+    testaxis = Axis()
+    print (testaxis.getActualPosition())
