@@ -21,4 +21,6 @@ class hmiControl:
         self.Start = False
         self.Stop = False
 
-        self.OperationMode = 0 #0=Manual / 1=Automatic
+        self.OperationMode = 0 # 0=Manual / 1=Automatic
+        self.CoordSystem = "wählen" # Hilfsvariable für das Koordinatensystem
+

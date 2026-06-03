@@ -10,7 +10,7 @@ import pyvista as pv
 import os
 import vtk
 
-class RobotViewer:
+class Scara:
     """
     Lädt die 3D-Modelle des Roboters und stellt eine interaktive Umgebung zur Steuerung bereit.
 
@@ -31,7 +31,7 @@ class RobotViewer:
     """
     
     def __init__(self, data_folder_path=None):
-        """Initialisiert den RobotViewer, lädt die Meshes und konfiguriert die Kamera."""
+        """Initialisiert den viewScadaRoboter, lädt die Meshes und konfiguriert die Kamera."""
         # 1. Pfade konfigurieren
         if data_folder_path is None:
             cwd = os.getcwd()
@@ -143,7 +143,7 @@ class RobotViewer:
 # --- Test-Aufruf ---
 if __name__ == "__main__":
     import time
-    robot = RobotViewer()
+    robot = Scara()
     robot.show()
     
     # Kurzer Test, um zu sehen, ob die Spindel mitfährt
