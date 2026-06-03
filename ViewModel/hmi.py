@@ -19,7 +19,11 @@ mitte = 200
 oben = 10
 unten = 350
 
+#Titel 
+
 Titel = tk.Label(root, text="Roboter Steuerung").pack()
+
+# Knöpfe
 
 button1 = tk.Button(root, text="Stop", activebackground="red", width=25, command=root.destroy)
 button1.pack()
@@ -70,17 +74,21 @@ combo_box.place(x=rechts, y= 40)
 
 # Achse
 
-Label1 = tk.Label(root, text="X")
-Label2 = tk.Label(root, text="Y")
-Label3 = tk.Label(root, text="Z")
-Label4 = tk.Label(root, text="R")
+Label1 = tk.Label(root, text="X :")
+Label2 = tk.Label(root, text="Y :")
+Label3 = tk.Label(root, text="Z :")
+Label4 = tk.Label(root, text="R :")
 
 Label1.place(x=links, y=100)
 Label2.place(x=links, y=125)
 Label3.place(x=links, y=150)
 Label4.place(x=links, y=175)
 
+# X-Achse
+x_label = tk.Label(root, text="0", font=("Arial", 10))
+x_label.pack(pady=5)
 
+<<<<<<< HEAD
 #Positionen
 
 links = 10
@@ -158,6 +166,8 @@ Label4.place(x=links, y=175)
 x_label = tk.Label(root, text="0", font=("Arial", 10))
 x_label.pack(pady=5)
 
+=======
+>>>>>>> 39dd9c7181ab6adbd7a8e4153fc1545773d261aa
 x_label.place(x=links + 30, y=100)
 
 # Y-Achse
@@ -178,7 +188,11 @@ r_label.pack(pady=5)
 
 r_label.place(x=links + 30, y=175)
 
+<<<<<<< HEAD
 # Beispielwerte setzen
+=======
+# Beispielwerte (Funktion: Achsen- Koordinaten einfügen)
+>>>>>>> 39dd9c7181ab6adbd7a8e4153fc1545773d261aa
 x_label.config(text="000")
 y_label.config(text="000")
 z_label.config(text="000")
