@@ -148,7 +148,7 @@ if __name__ == "__main__":
     
     # Kurzer Test, um zu sehen, ob die Spindel mitfährt
     print("Starte kurzen Bewegungstest...")
-    for i in range(100):
+    for i in range(500):
         # Drehe den inneren Arm und den äusseren Arm gleichzeitig
         robot.update_joints(inner_angle=i, outer_angle=-i*0.5, spindle_angle=i*2)
         time.sleep(0.05)

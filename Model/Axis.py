@@ -8,7 +8,13 @@ class Axis:
     def getActualPosition(self):
         return self.ActualPosition
 
+<<<<<<< HEAD
 
 
 testaxis = Axis()
 print (testaxis.getActualPosition())
+=======
+if __name__ == "__main__":
+    testaxis = Axis()
+    print (testaxis.getActualPosition())
+>>>>>>> 906e4b7919a94afb141dcf953e34722649f3b5ac
