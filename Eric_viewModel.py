@@ -2,7 +2,7 @@ import os
 os.environ["VTK_DEFAULT_OPENGL_WINDOW"] = "vtkWin32OpenGLRenderWindow"
 
 import pyvista as pv
-import vtk
+import vtk #Matrizenrechnen
 import time
 
 
