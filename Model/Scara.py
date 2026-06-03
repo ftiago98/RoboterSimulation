@@ -36,10 +36,10 @@ class Scara:
 
         return x, y, z, r
 
-
-robot = Scara()
-robot.setAxesJoint(30, 45, 50, 90)
-position = robot.forward()
-print(position)
+if __name__ == "__main__":
+    robot = Scara()
+    robot.setAxesJoint(30, 45, 50, 90)
+    position = robot.forward()
+    print(position)
 
    
