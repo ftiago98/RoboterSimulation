@@ -1,6 +1,9 @@
+import sys
+sys.path.append('../Model')
+
 import math
-from Axis import Axis
-from CncInterpreter import CncInterpreter
+from Model.Axis import Axis
+from Model.CncInterpreter import CncInterpreter
 
 class Scara:
     def __init__(self):

@@ -1,6 +1,9 @@
+import sys
+sys.path.append('../ViewModel')
+
 import tkinter as tk
 from tkinter import ttk
-import hmiControl
+from hmiControl import hmiControl
 
 class Hmi:
     def __init__(self):
@@ -10,7 +13,7 @@ class Hmi:
         self.root.minsize(400, 400)
 
         # Instanz der Steuerung
-        self.hmiControl = hmiControl.hmiControl()
+        self.hmiControl = hmiControl()
 
         # Achsenwerte
         self.x_value = 0

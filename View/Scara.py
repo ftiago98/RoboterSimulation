@@ -5,6 +5,8 @@ Dieses Modul nutzt `pyvista` und `vtk`, um die STL-Modelle eines mehrgliedrigen
 Roboters (Basis, innerer Arm, äusserer Arm, Spindel) zu laden, grafisch darzustellen 
 und durch Vorwärtskinematik hierarchisch zu animieren.
 """
+import sys
+sys.path.append('../View')
 
 import pyvista as pv
 import os

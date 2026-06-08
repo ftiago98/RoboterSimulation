@@ -197,90 +197,90 @@ class CncInterpreter:
 
         return robot_path
 
+if __name__ == "__main__":
+    # -------------------------
+    # HAUPTPROGRAMM
+    # -------------------------
 
-# -------------------------
-# HAUPTPROGRAMM
-# -------------------------
+    print("CNC Interpreter gestartet")
+    print("------------------------")
 
-print("CNC Interpreter gestartet")
-print("------------------------")
+    cnc = CncInterpreter()
 
-cnc = CncInterpreter()
+    # programm.nc muss im gleichen Ordner liegen wie diese Python-Datei
+    datei_pfad = Path(__file__).parent / "programm.nc"
 
-# programm.nc muss im gleichen Ordner liegen wie diese Python-Datei
-datei_pfad = Path(__file__).parent / "programm.nc"
+    print("Ich lese diese Datei:")
+    print(datei_pfad)
 
-print("Ich lese diese Datei:")
-print(datei_pfad)
+    print("\nInhalt der Datei:")
+    print(datei_pfad.read_text(encoding="utf-8"))
 
-print("\nInhalt der Datei:")
-print(datei_pfad.read_text(encoding="utf-8"))
+    cnc.load_from_path(datei_pfad)
 
-cnc.load_from_path(datei_pfad)
+    print ("\nInterpolierter Pfad:")
 
-print ("\nInterpolierter Pfad:")
+    interpolated_path = cnc.interpolate_path(step_size=10.0)
 
-interpolated_path = cnc.interpolate_path(step_size=10.0)
+    for point in interpolated_path:
+        print(f"X{point['X']} Y{point['Y']} Z{point['Z']}")
 
-for point in interpolated_path:
-    print(f"X{point['X']} Y{point['Y']} Z{point['Z']}")
+    # -------------------------
+    # BEWEGUNGEN AUSGEBEN
+    # -------------------------
 
-# -------------------------
-# BEWEGUNGEN AUSGEBEN
-# -------------------------
+    print("\nBewegungen aus Datei:")
 
-print("\nBewegungen aus Datei:")
+    for move in cnc.get_moves():
+        start = move["start"]
+        end = move["end"]
 
-for move in cnc.get_moves():
-    start = move["start"]
-    end = move["end"]
+        print(
+            f"Zeile {move['line']}: "
+            f"{move['type']} von "
+            f"X{start['X']} Y{start['Y']} Z{start['Z']} nach "
+            f"X{end['X']} Y{end['Y']} Z{end['Z']} "
+            f"mit F{move['feedrate']}"
+        )
 
-    print(
-        f"Zeile {move['line']}: "
-        f"{move['type']} von "
-        f"X{start['X']} Y{start['Y']} Z{start['Z']} nach "
-        f"X{end['X']} Y{end['Y']} Z{end['Z']} "
-        f"mit F{move['feedrate']}"
+
+    # -------------------------
+    # ROBOTER-PFAD EXPORTIEREN
+    # -------------------------
+
+    print("\nRoboter-Pfad 3D mit Geschwindigkeit und Verschleifpunkt:")
+
+    robot_path = cnc.export_robot_path(
+        default_rapid_speed=3000,
+        default_linear_speed=1000,
+        default_blend=2.0
     )
 
-
-# -------------------------
-# ROBOTER-PFAD EXPORTIEREN
-# -------------------------
-
-print("\nRoboter-Pfad 3D mit Geschwindigkeit und Verschleifpunkt:")
-
-robot_path = cnc.export_robot_path(
-    default_rapid_speed=3000,
-    default_linear_speed=1000,
-    default_blend=2.0
-)
-
-for point in robot_path:
-    print(
-        f"P{point['point_number']}: "
-        f"X={point['x']}, "
-        f"Y={point['y']}, "
-        f"Z={point['z']}, "
-        f"Speed={point['speed']}, "
-        f"Blend={point['blend']}, "
-        f"Typ={point['move_type']}"
-    )
+    for point in robot_path:
+        print(
+            f"P{point['point_number']}: "
+            f"X={point['x']}, "
+            f"Y={point['y']}, "
+            f"Z={point['z']}, "
+            f"Speed={point['speed']}, "
+            f"Blend={point['blend']}, "
+            f"Typ={point['move_type']}"
+        )
 
 
-# -------------------------
-# ROBOTER-BEFEHLE AUSGEBEN
-# -------------------------
+    # -------------------------
+    # ROBOTER-BEFEHLE AUSGEBEN
+    # -------------------------
 
-print("\nRoboter-Befehle:")
+    print("\nRoboter-Befehle:")
 
-for point in robot_path:
-    print(
-        f"move_to("
-        f"{point['x']}, "
-        f"{point['y']}, "
-        f"{point['z']}, "
-        f"speed={point['speed']}, "
-        f"blend={point['blend']}"
-        f")"
-    )
+    for point in robot_path:
+        print(
+            f"move_to("
+            f"{point['x']}, "
+            f"{point['y']}, "
+            f"{point['z']}, "
+            f"speed={point['speed']}, "
+            f"blend={point['blend']}"
+            f")"
+        )

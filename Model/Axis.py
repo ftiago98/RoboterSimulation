@@ -7,6 +7,9 @@ class Axis:
     
     def getActualPosition(self):
         return self.ActualPosition
+    
+    def getSetPosition(self):
+        return self.Sollposition
 
 if __name__ == "__main__":
     testaxis = Axis()

@@ -1,5 +1,8 @@
-from Axis import Axis
-from CncInterpreter import CncInterpreter
+import sys
+sys.path.append('../Model')
+
+from Model.Axis import Axis
+from Model.CncInterpreter import CncInterpreter
 
 class hBot:
 
@@ -89,24 +92,25 @@ if __name__ == "__main__":
     datei_pfad = Path(__file__).parent / "programm.nc"
     robot_path = cnc.export_robot_path()
         
-        # 2. Roboter initialisieren
-        bot = CoreXY()
+    # 2. Roboter initialisieren
+    bot = hBot()
+
     
-        
-        # 3. Den extrahierten Pfad an den Roboter übergeben
-        for point in robot_path:
-            # CoreXY nutzt vorerst nur X und Y
-            bot.move_to(point['x'], point['y'])
-            bot.status()
-# --------------------------------
-# TEST
-# --------------------------------
+    # 3. Den extrahierten Pfad an den Roboter übergeben
+    for point in robot_path:
+        # CoreXY nutzt vorerst nur X und Y
+        bot.move_to(point['x'], point['y'])
+        bot.status()
 
-bot = hBot()
+    # --------------------------------
+    # TEST
+    # --------------------------------
 
-target_x = int(input("Enter X: "))
-target_y = int(input("Enter Y: "))
+    bot = hBot()
 
-bot.move_to(target_x, target_y)
+    target_x = int(input("Enter X: "))
+    target_y = int(input("Enter Y: "))
 
-bot.status()
+    bot.move_to(target_x, target_y)
+
+    bot.status()
