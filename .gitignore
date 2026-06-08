@@ -10,3 +10,5 @@ Model/__pycache__/Axis.cpython-311.pyc
 Model/__pycache__/hBot.cpython-311.pyc
 View/__pycache__/Scara.cpython-311.pyc
 View/__pycache__/HBot.cpython-311.pyc
+Model/__pycache__/Axis.cpython-311.pyc
+ViewModel/__pycache__/hmi.cpython-311.pyc

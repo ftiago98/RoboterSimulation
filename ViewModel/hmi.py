@@ -6,9 +6,9 @@ from tkinter import ttk
 from hmiControl import hmiControl
 
 class Hmi:
-    def __init__(self):
+    def __init__(self,nameofHmi):
         self.root = tk.Tk()
-        self.root.title("HMI Roboter")
+        self.root.title(nameofHmi)
         self.root.configure(background="lightblue")
         self.root.minsize(400, 400)
 
@@ -25,6 +25,7 @@ class Hmi:
         links = 10
         rechts = 250
         unten = 350
+
 
         # ---------------- EVENTS ----------------
 
@@ -52,41 +53,7 @@ class Hmi:
             self.hmiControl.Start = False
             self.hmiControl.Stop = True
             print("Stop")
-            self.root.destroy()
 
-        # ---------------- ACHSEN ----------------
-
-        def x_plus():
-            self.x_value += 1
-            self.x_label.config(text=str(self.x_value))
-
-        def x_minus():
-            self.x_value -= 1
-            self.x_label.config(text=str(self.x_value))
-
-        def y_plus():
-            self.y_value += 1
-            self.y_label.config(text=str(self.y_value))
-
-        def y_minus():
-            self.y_value -= 1
-            self.y_label.config(text=str(self.y_value))
-
-        def z_plus():
-            self.z_value += 1
-            self.z_label.config(text=str(self.z_value))
-
-        def z_minus():
-            self.z_value -= 1
-            self.z_label.config(text=str(self.z_value))
-
-        def r_plus():
-            self.r_value += 1
-            self.r_label.config(text=str(self.r_value))
-
-        def r_minus():
-            self.r_value -= 1
-            self.r_label.config(text=str(self.r_value))
 
         # ---------------- UI ----------------
 
@@ -144,33 +111,81 @@ class Hmi:
         self.x_label = tk.Label(self.root, text="0", bg="lightblue")
         self.x_label.place(x=40, y=100)
 
-        tk.Button(self.root, text="+", width=3, command=x_plus).place(x=80, y=95)
-        tk.Button(self.root, text="-", width=3, command=x_minus).place(x=120, y=95)
+        self.ButtonXPlus = tk.Button(self.root, text="+", width=3)
+        self.ButtonXPlus.place(x=80, y=95)
+        self.ButtonXPlus.bind("<Button-1>", lambda event: self.x_plus(True))
+        self.ButtonXPlus.bind("<ButtonRelease-1>", lambda event: self.x_plus(False))
+
+        self.ButtonXNeg = tk.Button(self.root, text="-", width=3)
+        self.ButtonXNeg.place(x=120, y=95)
+        self.ButtonXNeg.bind("<Button-1>", lambda event: self.x_minus(True))
+        self.ButtonXNeg.bind("<ButtonRelease-1>", lambda event: self.x_minus(False))
 
         # Y
         self.y_label = tk.Label(self.root, text="0", bg="lightblue")
         self.y_label.place(x=40, y=130)
 
-        tk.Button(self.root, text="+", width=3, command=y_plus).place(x=80, y=125)
-        tk.Button(self.root, text="-", width=3, command=y_minus).place(x=120, y=125)
+        self.ButtonYPlus = tk.Button(self.root, text="+", width=3)
+        self.ButtonYPlus.place(x=80, y=125)
+        self.ButtonYPlus.bind("<Button-1>", lambda event: self.y_plus(True))
+        self.ButtonYPlus.bind("<ButtonRelease-1>", lambda event: self.y_plus(False))
+
+        tk.Button(self.root, text="-", width=3).place(x=120, y=125)
 
         # Z
         self.z_label = tk.Label(self.root, text="0", bg="lightblue")
         self.z_label.place(x=40, y=160)
 
-        tk.Button(self.root, text="+", width=3, command=z_plus).place(x=80, y=155)
-        tk.Button(self.root, text="-", width=3, command=z_minus).place(x=120, y=155)
+        tk.Button(self.root, text="+", width=3).place(x=80, y=155)
+        tk.Button(self.root, text="-", width=3).place(x=120, y=155)
 
         # R
         self.r_label = tk.Label(self.root, text="0", bg="lightblue")
         self.r_label.place(x=40, y=190)
 
-        tk.Button(self.root, text="+", width=3, command=r_plus).place(x=80, y=185)
-        tk.Button(self.root, text="-", width=3, command=r_minus).place(x=120, y=185)
+        tk.Button(self.root, text="+", width=3).place(x=80, y=185)
+        tk.Button(self.root, text="-", width=3).place(x=120, y=185)
 
+
+    def x_plus(self,value):
+        self.hmiControl.MoveXPlus = value
+        print("xplus")
+        self.x_label.config(text=str(self.x_value))
+
+    def x_minus(self,value):
+        self.hmiControl.MoveXNeg = value
+        print("xminus")
+        self.x_label.config(text=str(self.x_value))
+
+    def y_plus(self,value):
+        self.hmiControl.MoveYPlus = value
+        self.y_label.config(text=str(self.y_value))
+
+    def y_minus(self,value):
+        self.hmiControl.MoveYNeg = value
+        self.y_label.config(text=str(self.y_value))
+
+    def z_plus(self,value):
+        self.hmiControl.MoveZPlus = value
+        self.z_label.config(text=str(self.z_value))
+
+    def z_minus(self,value):
+        self.hmiControl.MoveZNeg = value
+        self.z_label.config(text=str(self.z_value))
+
+    def r_plus(self,value):
+        self.hmiControl.MoveRPlus = value
+        self.r_label.config(text=str(self.r_value))
+
+    def r_minus(self,value):
+        self.hmiControl.MoveRNeg = value
+        self.r_label.config(text=str(self.r_value))
+
+    def getHmiControl(self):
+        return self.hmiControl
 
 if __name__ == "__main__":
-    hmi = Hmi()
+    hmi = Hmi("Test Instance")
     hmi.root.mainloop()
 
     print(
