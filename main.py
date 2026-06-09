@@ -51,7 +51,7 @@ class Machine:
             hmiRobot1.root.update()
             hmiControl = hmiRobot1.getHmiControl()
             self.Robot1Manual = hmiControl.OperationMode == 0
-            print(self.Robot1Manual)
+            
             if self.Robot1Manual:
                 self.Robot1JointMode = hmiControl.CoordSystem == "Joint"
                 if self.Robot1JointMode:
@@ -92,7 +92,7 @@ class Machine:
             else:
                 self.Robot1JointMode = False #in Automatic nur Welt
                 if hmiControl.Start:
-                    self.robot1CncControl.load_from_path("programm.nc")
+                    self.robot1CncControl.load_from_path("Model\\programm.nc")
                     self.interpolated_path = iter(self.robot1CncControl.interpolate_path(step_size=3.0))
                     hmiControl.Start = False # reset the start
 
@@ -124,13 +124,21 @@ if __name__ == "__main__":
     machine = Machine()
 
     while True:
+        #update position on each cycle
+        machine.robot1CncControl.position = {
+            "X": machine.robot1Trafo.mcsAxisX.ActualPosition,
+            "Y": machine.robot1Trafo.mcsAxisY.ActualPosition,
+            "Z": machine.robot1Trafo.mcsAxisZ.ActualPosition
+        }
         if machine.Robot1JointMode:
             machine.robot1Trafo.forward()
         else:
             machine.robot1Trafo.backward()
         if machine.interpolated_path is not None:
             # Holt den nächsten Punkt. Der Iterator merkt sich, wo er war.
-            point = next(machine.path_iterator)
+
+            point = next(machine.interpolated_path,None)
+
             if point is not None:
                 machine.robot1Trafo.mcsAxisX.Sollposition =  point['X']
                 machine.robot1Trafo.mcsAxisY.Sollposition =  point['Y']
