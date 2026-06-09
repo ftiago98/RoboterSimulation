@@ -11,6 +11,9 @@ class Axis:
     def getSetPosition(self):
         return self.Sollposition
 
+    def cyclic(self):
+        self.ActualPosition = self.Sollposition
+
 if __name__ == "__main__":
     testaxis = Axis()
     print (testaxis.getActualPosition())

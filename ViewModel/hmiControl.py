@@ -1,3 +1,7 @@
+import sys
+sys.path.append('../ViewModel')
+
+
 class hmiControl:
     def __init__(self):
         self.MoveXPlus = False

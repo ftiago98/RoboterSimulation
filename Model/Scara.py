@@ -60,7 +60,15 @@ class Scara:
         self.acsAxis3.Sollposition = axis3
         self.acsAxis4.Sollposition = axis4
 
-
+    def cyclic(self):
+        self.acsAxis1.cyclic();
+        self.acsAxis2.cyclic();
+        self.acsAxis3.cyclic();
+        self.acsAxis4.cyclic();
+        self.mcsAxisX.cyclic();
+        self.mcsAxisY.cyclic();
+        self.mcsAxisZ.cyclic();
+        self.mcsAxisR.cyclic();
 
 if __name__ == "__main__":
     testaxis = Axis()
