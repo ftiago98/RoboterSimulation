@@ -169,6 +169,9 @@ class Hmi:
 
     def x_plus(self,value):
         self.hmiControl.MoveXPlus = value
+        if value == True:
+            self.hmiState.axisXPosition += 1
+            
         print("xplus")
 
     def x_minus(self,value):
