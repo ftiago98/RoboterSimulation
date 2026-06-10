@@ -21,7 +21,7 @@ class HBot:
         # 1. Pfad konfigurieren
         if data_folder_path is None:
             cwd = os.getcwd()
-            data_folder_path = os.path.join(cwd, "View", "H-Bot Modell")
+            data_folder_path = os.path.join(cwd, "View", "H_Bot_Modell")
 
         file_base_left = os.path.join(data_folder_path, "H-Bot 5.stl")
         file_base_right = os.path.join(data_folder_path, "H-Bot 1.stl")
