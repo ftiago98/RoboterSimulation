@@ -9,11 +9,18 @@ from hmiState import hmiState
 from tkinter import ttk, messagebox
 
 class Hmi:
-    def __init__(self,nameofHmi):
-        self.root = tk.Tk()
-        self.root.title(nameofHmi)
-        self.root.configure(background="lightblue")
-        self.root.minsize(400, 400)
+    def __init__(self, parent, nameofHmi):
+        self.root = tk.Frame(
+    parent,
+    bg="lightblue",
+    width=400,
+    height=400,
+    relief="ridge",
+    borderwidth=2
+)
+
+        self.root.pack(side="left", padx=5)
+        self.root.pack_propagate(False)
 
         # Instanz der Steuerung
         self.hmiControl = hmiControl()
@@ -58,7 +65,7 @@ class Hmi:
 
         titel = tk.Label(
             self.root,
-            text="Roboter Steuerung",
+            text=nameofHmi,
             bg="lightblue",
             font=("Arial", 12, "bold")
         )
@@ -240,21 +247,22 @@ class Hmi:
         self.r_label["text"]= self.hmiState.axisRPosition
 
 if __name__ == "__main__":
-    hmi = Hmi("Test Instance")
-    hmi.root.mainloop()
 
-    print(
-        f"Letzter Betriebsmodus: "
-        f"{hmi.hmiControl.OperationMode}"
-    )
-    
-def on_start_click():
-    self.hmiControl.Start = True
-    self.hmiControl.Stop = False
+    root = tk.Tk()
+    root.title("3 Roboter")
+    root.geometry("1200x450")
 
-    messagebox.showerror(
-        "Roboterfehler",
-        "Not-Halt betätigt!"
-    )
+    frame1 = tk.Frame(root)
+    frame1.pack(side="left", padx=5)
 
-    print("Start")
+    frame2 = tk.Frame(root)
+    frame2.pack(side="left", padx=5)
+
+    frame3 = tk.Frame(root)
+    frame3.pack(side="left", padx=5)
+
+    hmi1 = Hmi(frame1, "Roboter 1")
+    hmi2 = Hmi(frame2, "Roboter 2")
+    hmi3 = Hmi(frame3, "Roboter 3")
+
+    root.mainloop()
