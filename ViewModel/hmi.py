@@ -53,6 +53,9 @@ class Hmi:
         def on_start_click():
             self.hmiControl.Start = True
             self.hmiControl.Stop = False
+            messagebox.showerror(
+        "Fehler",
+        "Keine Achse eingegeben!")
             print("Start")
 
         def on_stop_click():
@@ -261,8 +264,10 @@ if __name__ == "__main__":
     frame3 = tk.Frame(root)
     frame3.pack(side="left", padx=5)
 
-    hmi1 = Hmi(frame1, "Roboter 1")
-    hmi2 = Hmi(frame2, "Roboter 2")
+    hmi1 = Hmi(frame1, "Roboter Scara")
+    hmi2 = Hmi(frame2, "Roboter Hbot")
     hmi3 = Hmi(frame3, "Roboter 3")
+
+
 
     root.mainloop()
