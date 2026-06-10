@@ -16,7 +16,7 @@ from Model.RobotConfig import SCARA_LIMITS
 class Scara:
     def __init__(self):
         self.L1 = 325
-        self.L2 = 550
+        self.L2 = 225
         self.L3 = 0
 
         # Gelenkachsen (ACS)
