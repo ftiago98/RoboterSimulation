@@ -171,30 +171,58 @@ class Hmi:
         self.hmiControl.MoveXPlus = value
         if value == True:
             self.hmiState.axisXPosition += 1
-            
+            self.x_label["text"] = self.hmiState.axisXPosition   
         print("xplus")
 
     def x_minus(self,value):
         self.hmiControl.MoveXNeg = value
+        if value == True:
+            self.hmiState.axisXPosition -= 1
+            self.x_label["text"] = self.hmiState.axisXPosition
         print("xminus")
 
     def y_plus(self,value):
         self.hmiControl.MoveYPlus = value
+        if value == True:
+            self.hmiState.axisYPosition += 1
+            self.y_label["text"] = self.hmiState.axisYPosition
+        print("yplus")        
 
-    def y_minus(self,value):
+    def y_minus(self,value):    
         self.hmiControl.MoveYNeg = value
+        if value == True:
+            self.hmiState.axisYPosition -= 1
+            self.y_label["text"] = self.hmiState.axisYPosition
+        print("yminus")
 
     def z_plus(self,value):
+
         self.hmiControl.MoveZPlus = value
+        if value == True:
+            self.hmiState.axisZPosition += 1
+            self.z_label["text"] = self.hmiState.axisZPosition
+        print("zplus")    
 
     def z_minus(self,value):
         self.hmiControl.MoveZNeg = value
+        if value == True:
+            self.hmiState.axisZPosition -= 1
+            self.z_label["text"] = self.hmiState.axisZPosition
+        print("zminus")    
 
     def r_plus(self,value):
         self.hmiControl.MoveRPlus = value
+        if value == True:
+            self.hmiState.axisRPosition += 1
+            self.r_label["text"] = self.hmiState.axisRPosition
+        print("rplus")    
 
     def r_minus(self,value):
         self.hmiControl.MoveRNeg = value
+        if value == True:
+            self.hmiState.axisRPosition -= 1
+            self.r_label["text"] = self.hmiState.axisRPosition
+        print("rminus")    
 
     def getHmiControl(self):
         return self.hmiControl
