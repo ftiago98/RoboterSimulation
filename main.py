@@ -99,7 +99,7 @@ class Machine:
         # H-Bot in der Mitte
         self.cncView = HBotView(
             pl=self.sharedPlotter,
-            position=(0, 0, 0)
+            position=(0, 0, 200)
         )
 
         # SCARA 2 rechts
