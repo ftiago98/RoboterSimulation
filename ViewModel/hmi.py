@@ -53,9 +53,8 @@ class Hmi:
         def on_start_click():
             self.hmiControl.Start = True
             self.hmiControl.Stop = False
-            messagebox.showerror(
-        "Fehler",
-        "Keine Achse eingegeben!")
+            messagebox.showinfo(
+        "Task failed successfully", "The task has failed successfully.")
             print("Start")
 
         def on_stop_click():
