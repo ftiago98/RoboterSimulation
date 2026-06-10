@@ -5,8 +5,8 @@ Dieses Modul nutzt `pyvista` und `vtk`, um die STL-Modelle eines mehrgliedrigen
 Roboters (Basis, innerer Arm, äusserer Arm, Spindel) zu laden, grafisch darzustellen 
 und durch Vorwärtskinematik hierarchisch zu animieren.
 
-Erweiterung: Am Ende der Spindel ist ein Parallelgreifer (Endeffektor) angebaut,
-der bei jeder Bewegung mitfährt und damit im 3D sichtbar ist.
+Erweiterung: Am unteren Ende der Spindel ist ein Parallelgreifer (Endeffektor)
+angebaut, der bei jeder Bewegung mitfährt und damit im 3D sichtbar ist.
 """
 import sys
 sys.path.append('../View')
@@ -52,6 +52,7 @@ class Scara:
         inner_arm_mesh = pv.read(inner_arm_file)
         outer_arm_mesh = pv.read(outer_arm_file)
         spindle_mesh = pv.read(spindle_file)
+        self.spindle_mesh = spindle_mesh   # fuer die Greifer-Positionierung
 
         # 3. Plotter und Szene aufbauen
         self.pl = pv.Plotter()
@@ -71,7 +72,7 @@ class Scara:
         self.outer_arm_actor.origin = self.origin_outer
         self.spindle_actor.origin = self.origin_spindle
 
-        # 4b. Greifer (Endeffektor) an der Spindel erstellen  <<< NEU
+        # 4b. Greifer (Endeffektor) am unteren Ende der Spindel erstellen
         self._add_gripper()
 
         # 5. Kamera einstellen
@@ -83,31 +84,35 @@ class Scara:
 
     def _add_gripper(self):
         """
-        Erzeugt einen einfachen Parallelgreifer (Halterung + zwei Finger) am Ende
-        der Spindel, damit der Endeffektor im 3D sichtbar ist.
+        Baut einen sichtbaren Parallelgreifer (Halterung + zwei Finger) am
+        tatsaechlichen unteren Ende der Spindel.
 
-        Der Greifer wird am Drehpunkt der Spindel (`origin_spindle`) aufgebaut.
-        In `update_joints` bekommt er dieselbe Transformation wie die Spindel und
-        fährt daher starr mit. Die Finger werden mittig (y=0) gebaut und in
-        `update_joints` ueber den Fingerabstand `gripper_half_width` auseinander-
-        geschoben -> dadurch ist auch ein spaeteres Auf/Zu moeglich.
+        Die Position wird aus den Mesh-Grenzen (`bounds`) der Spindel berechnet,
+        NICHT aus dem Drehpunkt - der Drehpunkt liegt nicht zwingend dort, wo
+        die Spindel gezeichnet ist. In `update_joints` bekommt der Greifer
+        dieselbe Transformation wie die Spindel und faehrt daher starr mit.
 
-        Hinweis zum Anpassen: Sitzt der Greifer nicht genau am sichtbaren Ende der
-        Spindel, einfach `self.gripper_z` veraendern (nach unten = negativer).
+        Feinabgleich bei Bedarf ueber `self.gripper_offset = (dx, dy, dz)`.
         """
-        tx, ty, _ = self.origin_spindle      # Anbaupunkt = Spindel-Drehpunkt
-        self.gripper_z = 0.0                  # Hoehenversatz, bei Bedarf anpassen
-        self.gripper_half_width = 20.0        # halber Fingerabstand (offen)
+        b = self.spindle_mesh.bounds        # (xmin, xmax, ymin, ymax, zmin, zmax)
+        print("Spindel-Bounds:", b)         # zur Kontrolle, kann spaeter weg
+        cx = (b[0] + b[1]) / 2.0            # Mitte X der Spindel
+        cy = (b[2] + b[3]) / 2.0            # Mitte Y der Spindel
+        tip_z = b[4]                        # unterstes Ende = Werkzeugspitze
 
+        # Feinabgleich (dx, dy, dz), falls noetig:
+        self.gripper_offset = (0.0, 0.0, 0.0)
+        ox, oy, oz = self.gripper_offset
+        tx, ty, tz = cx + ox, cy + oy, tip_z + oz
+
+        self.gripper_half_width = 20.0      # halber Fingerabstand (offen)
         finger_len = 60.0
-        z_mount = self.gripper_z - 10.0
-        z_finger = self.gripper_z - 10.0 - finger_len / 2.0
 
-        # Halterung (Block direkt unter der Spindel)
-        mount = pv.Cube(center=(tx, ty, z_mount),
+        # Halterung (Block am Spindelende)
+        mount = pv.Cube(center=(tx, ty, tz + 10),
                         x_length=40, y_length=70, z_length=20)
-        # Zwei Finger, mittig gebaut (Versatz spaeter per Transformation)
-        finger = pv.Cube(center=(tx, ty, z_finger),
+        # Zwei Finger, mittig gebaut (Versatz erfolgt in update_joints)
+        finger = pv.Cube(center=(tx, ty, tz - finger_len / 2.0),
                          x_length=14, y_length=14, z_length=finger_len)
 
         self.gripper_mount_actor = self.pl.add_mesh(mount, color="dimgray")
@@ -115,7 +120,7 @@ class Scara:
         self.gripper_finger_r_actor = self.pl.add_mesh(finger.copy(), color="red")
 
     def set_gripper(self, closed=False):
-        """Optional: Greifer auf/zu (veraendert nur den sichtbaren Fingerabstand)."""
+        """Optional: Greifer auf/zu (aendert nur den sichtbaren Fingerabstand)."""
         self.gripper_half_width = 7.0 if closed else 20.0
 
     def _create_rotation(self, origin, angle):
@@ -151,8 +156,8 @@ class Scara:
         Aktualisiert die Gelenkwinkel und berechnet die neue Position der Roboterarme.
 
         Die Methode wendet Vorwärtskinematik an, indem sie die VTK-Transformationen 
-        verkettet. Der äussere Arm erbt die Rotation des inneren Arms, und die Spindel 
-        erbt die Rotationen beider übergeordneten Arme. Der Greifer erbt die Spindel.
+        verkettet. Der äussere Arm erbt die Rotation des inneren Arms, die Spindel 
+        erbt beide übergeordneten Arme, und der Greifer erbt die Spindel.
 
         Args:
             inner_angle (float, optional): Der Rotationswinkel des inneren Arms in Grad. Standard ist 0.
@@ -177,7 +182,7 @@ class Scara:
         t_spindle.Concatenate(t_outer) # Verknüpfung mit dem äusseren Arm
         self.spindle_actor.SetUserTransform(t_spindle)
 
-        # --- 4. Greifer (Kind von der Spindel) ---  <<< NEU
+        # --- 4. Greifer (Kind von der Spindel) ---
         # Halterung faehrt 1:1 mit der Spindel.
         self.gripper_mount_actor.SetUserTransform(t_spindle)
         # Finger: erst lokal um +/- halben Fingerabstand verschieben, dann die
