@@ -5,4 +5,4 @@ ViewModel/__pycache__/*
 Model\__pycache__\*
 View\__pycache__\*
 ViewModel\__pycache__\*
-
+*.pyc
