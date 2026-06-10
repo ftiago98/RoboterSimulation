@@ -18,6 +18,7 @@ class Hmi:
         # Instanz der Steuerung
         self.hmiControl = hmiControl()
         self.hmiState = hmiState()
+        self.step = 1
 
         # Layout
         links = 10
@@ -168,31 +169,33 @@ class Hmi:
         self.ButtonRNeg.bind("<Button-1>", lambda event: self.r_minus(True))
         self.ButtonRNeg.bind("<ButtonRelease-1>", lambda event: self.r_minus(False))
 
-
+    def is_hand_mode(self):
+        return self.hmiControl.OperationMode == 0
+    
     def x_plus(self,value):
         self.hmiControl.MoveXPlus = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisXPosition += 1
             self.x_label["text"] = self.hmiState.axisXPosition   
         print("xplus")
 
     def x_minus(self,value):
         self.hmiControl.MoveXNeg = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisXPosition -= 1
             self.x_label["text"] = self.hmiState.axisXPosition
         print("xminus")
 
     def y_plus(self,value):
         self.hmiControl.MoveYPlus = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisYPosition += 1
             self.y_label["text"] = self.hmiState.axisYPosition
         print("yplus")        
 
     def y_minus(self,value):    
         self.hmiControl.MoveYNeg = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisYPosition -= 1
             self.y_label["text"] = self.hmiState.axisYPosition
         print("yminus")
@@ -200,28 +203,28 @@ class Hmi:
     def z_plus(self,value):
 
         self.hmiControl.MoveZPlus = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisZPosition += 1
             self.z_label["text"] = self.hmiState.axisZPosition
         print("zplus")    
 
     def z_minus(self,value):
         self.hmiControl.MoveZNeg = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisZPosition -= 1
             self.z_label["text"] = self.hmiState.axisZPosition
         print("zminus")    
 
     def r_plus(self,value):
         self.hmiControl.MoveRPlus = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisRPosition += 1
             self.r_label["text"] = self.hmiState.axisRPosition
         print("rplus")    
 
     def r_minus(self,value):
         self.hmiControl.MoveRNeg = value
-        if value == True:
+        if value and self.is_hand_mode():
             self.hmiState.axisRPosition -= 1
             self.r_label["text"] = self.hmiState.axisRPosition
         print("rminus")    
