@@ -42,20 +42,22 @@ SCHIEBER_QUELLE = BASIS_URL + "Magazin_Schieber.stl"
 # ROHTEIL_QUELLE  = str(MODELL_ORDNER / "Roh_Teil.stl")
 # SCHIEBER_QUELLE = str(MODELL_ORDNER / "Magazin_Schieber.stl")
 
-# Befüllung
+# Befüllung (Werte aus der V2-Geometrie ermittelt)
 ANZAHL_TEILE   = None      # None = automatisch maximal befüllen
 FUELLGRAD      = 1.0       # 1.0 = voll, 0.5 = halb voll (nur falls ANZAHL_TEILE = None)
-BODEN_Z        = None      # None = automatisch (Unterkante Magazin-Innenraum)
-LUFT_OBEN      = 0.0       # Sicherheitsabstand zur Oberkante in mm
+BODEN_Z        = 1.0       # Oberkante Bodenplatte des V2-Schachts
+LUFT_OBEN      = 1.0       # Sicherheitsabstand zur Oberkante in mm
 
-# Position der Rohteile: None = automatisch im Magazin zentriert,
-# sonst feste Werte in mm angeben, z.B. POSITION_X = 10.0
-POSITION_X     = None
-POSITION_Y     = None
+# Position der Rohteile im Schacht (Innenraum X 5..115, Y 0..50):
+# X = 10 -> Teil (100 mm) zentriert, 5 mm Spiel pro Seite. Y = 0 -> passgenau.
+POSITION_X     = 10.0
+POSITION_Y     = 0.0
 
-# Schieber: wird an seiner Original-Position aus dem CAD angezeigt.
-# Mit dem Versatz kannst du ihn verschieben (z.B. Hub simulieren):
-SCHIEBER_VERSATZ = np.array([0.0, 0.0, 0.0])   # [X, Y, Z] in mm
+# Schieber: Ruheposition liegt im CAD bei X 120..290, er schiebt in
+# -X-Richtung durch das runde Loch (Ø25, Mitte Y=25/Z=25) in der
+# rechten Schachtwand. Mit dem Hub simulierst du den Ausschiebevorgang:
+# 0 = eingefahren, ca. 110-115 = unterstes Teil komplett ausgeschoben.
+SCHIEBER_HUB   = 0.0       # Hub in mm (in -X-Richtung)
 
 # Export des gefüllten Magazins (None = kein Export)
 EXPORT_DATEI = str(SKRIPT_ORDNER / "Magazin_gefuellt.stl")
@@ -144,8 +146,8 @@ mag_groesse = mag_max - mag_min
 # damit die Platzierung vorhersagbar ist
 rohteil = rohteil - rt_min
 
-# Schieber-Versatz anwenden
-schieber = schieber + SCHIEBER_VERSATZ
+# Schieber-Hub anwenden (Bewegung in -X-Richtung)
+schieber = schieber + np.array([-SCHIEBER_HUB, 0.0, 0.0])
 
 
 # ----------------------------------------------------------
