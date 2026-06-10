@@ -45,7 +45,7 @@ class HBot:
         # 1. Pfade konfigurieren (Standard: Ordner der ausgeführten Datei)
         if data_folder_path is None:
             cwd = os.getcwd()
-            data_folder_path = os.path.join(cwd, "View", "H-Bot Modell")
+            data_folder_path = os.path.join(cwd, "View", "H_Bot_Modell")
 
         # Zuordnung deiner hochgeladenen Dateien
         file_base_left = os.path.join(data_folder_path, "H-Bot 5.stl")

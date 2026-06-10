@@ -40,7 +40,7 @@ class Scara:
         # 1. Pfade konfigurieren
         if data_folder_path is None:
             cwd = os.getcwd()
-            data_folder_path = os.path.join(cwd, "View", "data")
+            data_folder_path = os.path.join(cwd, "View", "Scara Modell")
             
         base_file = os.path.join(data_folder_path, "Base.stl")
         inner_arm_file = os.path.join(data_folder_path, "InnerArm.stl")
