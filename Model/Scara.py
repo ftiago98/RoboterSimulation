@@ -1,9 +1,17 @@
+"""
+Module: Scara
+Purpose: Kinematic model for a 4-DOF SCARA robot.
+Responsibilities: Forward kinematics (ACS→MCS), inverse kinematics (MCS→ACS), cyclic axis update.
+Inputs:  acsAxis1–4 (joint angles / hub height) or mcsAxisX/Y/Z/R (Cartesian target).
+Outputs: Updated opposite coordinate set after forward() or backward() call.
+Dependencies: Model.Axis, Model.RobotConfig
+"""
 import sys
 sys.path.append('../Model')
 
 import math
 from Model.Axis import Axis
-from Model.CncInterpreter import CncInterpreter
+from Model.RobotConfig import SCARA_LIMITS
 
 class Scara:
     def __init__(self):
@@ -12,16 +20,16 @@ class Scara:
         self.L3 = 0
 
         # Gelenkachsen (ACS)
-        self.acsAxis1 = Axis() # Gelenk 1
-        self.acsAxis2 = Axis() # Gelenk 2
-        self.acsAxis3 = Axis() # Hubachse
-        self.acsAxis4 = Axis() # Werkzeugdrehachse
+        self.acsAxis1 = Axis(*SCARA_LIMITS["acsAxis1"]) # Gelenk 1
+        self.acsAxis2 = Axis(*SCARA_LIMITS["acsAxis2"]) # Gelenk 2
+        self.acsAxis3 = Axis(*SCARA_LIMITS["acsAxis3"]) # Hubachse
+        self.acsAxis4 = Axis(*SCARA_LIMITS["acsAxis4"]) # Werkzeugdrehachse
 
         # Kartesische Achsen (MCS)
-        self.mcsAxisX = Axis() # X Achse
-        self.mcsAxisY = Axis() # Y Achse
-        self.mcsAxisZ = Axis() # Z Achse
-        self.mcsAxisR = Axis() # Rotationsachse
+        self.mcsAxisX = Axis(*SCARA_LIMITS["mcsAxisX"]) # X Achse
+        self.mcsAxisY = Axis(*SCARA_LIMITS["mcsAxisY"]) # Y Achse
+        self.mcsAxisZ = Axis(*SCARA_LIMITS["mcsAxisZ"]) # Z Achse
+        self.mcsAxisR = Axis(*SCARA_LIMITS["mcsAxisR"]) # Rotationsachse
 
     def forward(self): # Vorwärtskinematik berechnen # Winkel von Grad in Bogenmaß umrechnen
         axis1 = math.radians(self.acsAxis1.Sollposition)
@@ -70,22 +78,3 @@ class Scara:
         self.mcsAxisZ.cyclic();
         self.mcsAxisR.cyclic();
 
-if __name__ == "__main__":
-    testaxis = Axis()
-    print (testaxis.getActualPosition())
-
-    robot = Scara()
-
-    robot.setAxesJoint(30, 45, 50, 90)
-    position = robot.forward()
-    print("Forward:", position)
-
-    achsen = robot.backward(position[0], position[1], position[2], position[3])
-    print("Backward:", achsen)
-
-    robot.setAxesJoint(achsen[0], achsen[1], achsen[2], achsen[3])
-    position2 = robot.forward()
-    print("Kontrolle:", position2)
-
-
-   

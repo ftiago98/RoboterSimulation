@@ -208,6 +208,19 @@ class Scara:
             color="red"
         )
 
+        # Workpiece actor — hidden until gripper closes
+        part_mesh = pv.Box(bounds=(
+            tx - 40, tx + 40,
+            ty - 30, ty + 30,
+            tz - finger_len - 10, tz - finger_len + 10,
+        ))
+        self._part_actor = self.pl.add_mesh(part_mesh, color="saddlebrown")
+        self._part_actor.SetVisibility(False)
+
+    def attach_part(self, visible: bool):
+        """Show or hide the workpiece actor held by the gripper."""
+        self._part_actor.SetVisibility(visible)
+
     def set_gripper(self, closed=False):
         """
         Greifer öffnen oder schliessen.
@@ -268,7 +281,7 @@ class Scara:
 
         self.pl.show(interactive_update=True, auto_close=False)
 
-    def update_joints(self, inner_angle=0, outer_angle=0, spindle_angle=0, render=True):
+    def update_joints(self, inner_angle=0, outer_angle=0, spindle_angle=0, z_height=0.0, render=True):
         """
         Aktualisiert die Gelenkwinkel.
 
@@ -312,6 +325,7 @@ class Scara:
         )
 
         t_spindle.Concatenate(t_outer)
+        t_spindle.Translate(0.0, 0.0, z_height)
 
         self.spindle_actor.SetUserTransform(t_spindle)
 
@@ -332,6 +346,8 @@ class Scara:
 
         self.gripper_finger_l_actor.SetUserTransform(t_finger_l)
         self.gripper_finger_r_actor.SetUserTransform(t_finger_r)
+
+        self._part_actor.SetUserTransform(t_spindle)
 
         # --------------------------------------------------------
         # 5. Fenster aktualisieren
