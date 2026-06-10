@@ -53,7 +53,7 @@ class Hmi:
         def on_start_click():
             self.hmiControl.Start = True
             self.hmiControl.Stop = False
-            messagebox.showinfo(
+            messagebox.showerror(
         "Task failed successfully", "The task has failed successfully.")
             print("Start")
 
