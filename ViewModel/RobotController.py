@@ -44,11 +44,17 @@ class RobotController:
             self.robot_trafo.acsAxis4.Sollposition = SCARA_HOME["acsAxis4"]
             hmi_ctrl.Reset = False  # consume pulse
 
-        # Update status display every tick
+        # Determine operating context for status check
+        is_manual = hmi_ctrl.OperationMode == 0
+        coord_ok  = hmi_ctrl.CoordSystem in ["Joint", "Welt", "Werkzeug"]
+
+        # Status priority: fault > limit > missing coord > normal
         if self._fault:
             self.hmi.setStatus("STÖRUNG — Reset drücken", "red")
         elif self._any_at_limit():
             self.hmi.setStatus("Achse an Grenzwert", "orange")
+        elif is_manual and not coord_ok:
+            self.hmi.setStatus("Koordinatensystem wählen!", "orange")
         else:
             self.hmi.setStatus("Bereit", "lightgreen")
 
@@ -57,10 +63,13 @@ class RobotController:
             self.hmi.setHmiState(self.hmi_state)
             return
 
-        self._manual_mode = hmi_ctrl.OperationMode == 0
+        self._manual_mode = is_manual
 
         if self._manual_mode:
-            self._joint_mode = self._handle_manual_control(hmi_ctrl)
+            # Only jog if the operator has selected a coordinate system
+            if coord_ok:
+                self._joint_mode = self._handle_manual_control(hmi_ctrl)
+            # else: keep _joint_mode as-is; forward() keeps MCS in sync, no motion
             self._handle_gripper(hmi_ctrl)
         else:
             self._joint_mode = False
@@ -80,6 +89,7 @@ class RobotController:
                 self.robot_trafo.forward()
             else:
                 self.robot_trafo.backward()
+                self.robot_trafo.forward()  # MCS mit erreichter Position synchronisieren
         except ValueError as e:
             print(f"Kinematik Fehler: {e}")
             for axis in [
@@ -138,53 +148,23 @@ class RobotController:
             coord_system = "Joint"
 
         if coord_system == "Joint":
-            # Each button directly moves one joint / one axis
-            # X→J1, Y→J2, Z→Hubachse (linear), R→Werkzeugdrehachse
-            if hmi_ctrl.MoveXPlus: self.robot_trafo.acsAxis1.Sollposition += step_joint
-            if hmi_ctrl.MoveXNeg:  self.robot_trafo.acsAxis1.Sollposition -= step_joint
-            if hmi_ctrl.MoveYPlus: self.robot_trafo.acsAxis2.Sollposition += step_joint
-            if hmi_ctrl.MoveYNeg:  self.robot_trafo.acsAxis2.Sollposition -= step_joint
-            if hmi_ctrl.MoveZPlus: self.robot_trafo.acsAxis3.Sollposition += step_joint
-            if hmi_ctrl.MoveZNeg:  self.robot_trafo.acsAxis3.Sollposition -= step_joint
-            if hmi_ctrl.MoveRPlus: self.robot_trafo.acsAxis4.Sollposition += step_joint
-            if hmi_ctrl.MoveRNeg:  self.robot_trafo.acsAxis4.Sollposition -= step_joint
-            return True  # → forward() in update_kinematics
+            da1, da2, da3, da4 = self._jog_delta(hmi_ctrl, step_joint)
+            self.robot_trafo.jog_joint(da1, da2, da3, da4)
+            return True
 
-        elif coord_system == "Welt":
-            # Buttons move TCP in the robot base (world) coordinate frame
-            if hmi_ctrl.MoveXPlus: self.robot_trafo.mcsAxisX.Sollposition += step_world
-            if hmi_ctrl.MoveXNeg:  self.robot_trafo.mcsAxisX.Sollposition -= step_world
-            if hmi_ctrl.MoveYPlus: self.robot_trafo.mcsAxisY.Sollposition += step_world
-            if hmi_ctrl.MoveYNeg:  self.robot_trafo.mcsAxisY.Sollposition -= step_world
-            if hmi_ctrl.MoveZPlus: self.robot_trafo.mcsAxisZ.Sollposition += step_world
-            if hmi_ctrl.MoveZNeg:  self.robot_trafo.mcsAxisZ.Sollposition -= step_world
-            if hmi_ctrl.MoveRPlus: self.robot_trafo.mcsAxisR.Sollposition += step_world
-            if hmi_ctrl.MoveRNeg:  self.robot_trafo.mcsAxisR.Sollposition -= step_world
-            return False  # → backward() in update_kinematics
+        dx, dy, dz, dr = self._jog_delta(hmi_ctrl, step_world)
+        if coord_system == "Welt":
+            self.robot_trafo.jog_world(dx, dy, dz, dr)
+        else:  # Werkzeug
+            self.robot_trafo.jog_tool(dx, dy, dz, dr)
+        return False
 
-        else:  # Werkzeug — jog along/across the tool flange axes
-            # X/Y jog is rotated by the current absolute flange angle (mcsAxisR).
-            # For a flat SCARA, tool Z is always parallel to world Z → Z/R unchanged.
-            r_rad = math.radians(self.robot_trafo.mcsAxisR.ActualPosition)
-            cos_r = math.cos(r_rad)
-            sin_r = math.sin(r_rad)
-
-            tool_dx = 0.0
-            tool_dy = 0.0
-            if hmi_ctrl.MoveXPlus: tool_dx += step_world
-            if hmi_ctrl.MoveXNeg:  tool_dx -= step_world
-            if hmi_ctrl.MoveYPlus: tool_dy += step_world
-            if hmi_ctrl.MoveYNeg:  tool_dy -= step_world
-
-            # Rotate tool-frame vector into world frame
-            self.robot_trafo.mcsAxisX.Sollposition += tool_dx * cos_r - tool_dy * sin_r
-            self.robot_trafo.mcsAxisY.Sollposition += tool_dx * sin_r + tool_dy * cos_r
-
-            if hmi_ctrl.MoveZPlus: self.robot_trafo.mcsAxisZ.Sollposition += step_world
-            if hmi_ctrl.MoveZNeg:  self.robot_trafo.mcsAxisZ.Sollposition -= step_world
-            if hmi_ctrl.MoveRPlus: self.robot_trafo.mcsAxisR.Sollposition += step_world
-            if hmi_ctrl.MoveRNeg:  self.robot_trafo.mcsAxisR.Sollposition -= step_world
-            return False  # → backward() in update_kinematics
+    def _jog_delta(self, hmi_ctrl, step):
+        dx = (step if hmi_ctrl.MoveXPlus else 0.0) - (step if hmi_ctrl.MoveXNeg else 0.0)
+        dy = (step if hmi_ctrl.MoveYPlus else 0.0) - (step if hmi_ctrl.MoveYNeg else 0.0)
+        dz = (step if hmi_ctrl.MoveZPlus else 0.0) - (step if hmi_ctrl.MoveZNeg else 0.0)
+        dr = (step if hmi_ctrl.MoveRPlus else 0.0) - (step if hmi_ctrl.MoveRNeg else 0.0)
+        return dx, dy, dz, dr
 
     def _handle_gripper(self, hmi_ctrl):
         if getattr(hmi_ctrl, "Start", False):

@@ -49,8 +49,12 @@ class Scara:
         if d > self.L1 + self.L2 or d < abs(self.L1 - self.L2):
             raise ValueError("Punkt außerhalb der Reichweite des Roboters") # Prüfen ob Punkt erreichbar ist
         
-        cos_axis2 = (self.mcsAxisX.Sollposition**2 + self.mcsAxisY.Sollposition**2 - self.L1**2 -self.L2**2) / (2 * self.L1 * self.L2) # Kosinus des Winkels von Gelenk 2
-        axis2 = math.acos(cos_axis2) # Winkel von Gelenk 2
+        cos_axis2 = (self.mcsAxisX.Sollposition**2 + self.mcsAxisY.Sollposition**2 - self.L1**2 - self.L2**2) / (2 * self.L1 * self.L2)
+        cos_axis2 = max(-1.0, min(1.0, cos_axis2))  # Gleitkomma-Absicherung am Arbeitsraumrand
+        axis2_up   =  math.acos(cos_axis2)  # Elbow-up-Lösung  (≥ 0)
+        axis2_down = -axis2_up               # Elbow-down-Lösung (≤ 0)
+        current_a2 = math.radians(self.acsAxis2.ActualPosition)
+        axis2 = axis2_down if abs(axis2_down - current_a2) < abs(axis2_up - current_a2) else axis2_up
 
         k1 = self.L1 + self.L2 * math.cos(axis2) # Hilfsgröße für Berechnung von Gelenk 1
         k2 = self.L2 * math.sin(axis2) # Hilfsgröße für Berechnung von Gelenk 1
@@ -67,6 +71,33 @@ class Scara:
         self.acsAxis2.Sollposition = axis2_deg
         self.acsAxis3.Sollposition = axis3
         self.acsAxis4.Sollposition = axis4
+
+    def jog_joint(self, da1=0.0, da2=0.0, da3=0.0, da4=0.0):
+        self.acsAxis1.Sollposition += da1
+        self.acsAxis2.Sollposition += da2
+        self.acsAxis3.Sollposition += da3
+        self.acsAxis4.Sollposition += da4
+
+    def jog_world(self, dx=0.0, dy=0.0, dz=0.0, dr=0.0):
+        new_x = self.mcsAxisX.Sollposition + dx
+        new_y = self.mcsAxisY.Sollposition + dy
+        # Schritt blockieren wenn der Zielpunkt außerhalb des erreichbaren Rings liegt
+        if abs(self.L1 - self.L2) <= math.sqrt(new_x**2 + new_y**2) <= self.L1 + self.L2:
+            self.mcsAxisX.Sollposition = new_x
+            self.mcsAxisY.Sollposition = new_y
+        self.mcsAxisZ.Sollposition += dz
+        self.mcsAxisR.Sollposition += dr
+
+    def jog_tool(self, dx=0.0, dy=0.0, dz=0.0, dr=0.0):
+        r = math.radians(self.mcsAxisR.ActualPosition)
+        new_x = self.mcsAxisX.Sollposition + dx * math.cos(r) - dy * math.sin(r)
+        new_y = self.mcsAxisY.Sollposition + dx * math.sin(r) + dy * math.cos(r)
+        # Schritt blockieren wenn der Zielpunkt außerhalb des erreichbaren Rings liegt
+        if abs(self.L1 - self.L2) <= math.sqrt(new_x**2 + new_y**2) <= self.L1 + self.L2:
+            self.mcsAxisX.Sollposition = new_x
+            self.mcsAxisY.Sollposition = new_y
+        self.mcsAxisZ.Sollposition += dz
+        self.mcsAxisR.Sollposition += dr
 
     def cyclic(self):
         self.acsAxis1.cyclic();

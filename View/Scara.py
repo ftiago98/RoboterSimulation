@@ -92,7 +92,7 @@ class Scara:
         # --------------------------------------------------------
         original_origin_inner = (0.0, 0.0, 0.0)
         original_origin_outer = (-325.0, 0.0, 0.0)
-        original_origin_spindle = (-550.0, 0.0, 0.0)
+        original_origin_spindle = (-550.0, 0.0, 0.0)  # = Axis2 + Axis3_lokal = -325 + (-550)
 
         # --------------------------------------------------------
         # 8. Drehpunkte ebenfalls verschieben
@@ -237,20 +237,6 @@ class Scara:
     # ============================================================
     # TRANSFORMATIONEN
     # ============================================================
-    def _create_rotation(self, origin, angle):
-        """
-        Erstellt eine Rotation um die Z-Achse um einen bestimmten Drehpunkt.
-        """
-
-        transform = vtk.vtkTransform()
-        transform.PostMultiply()
-
-        transform.Translate(-origin[0], -origin[1], -origin[2])
-        transform.RotateZ(angle)
-        transform.Translate(origin[0], origin[1], origin[2])
-
-        return transform
-
     def _create_gripper_finger_transform(self, t_spindle, y_offset):
         """
         Erstellt eine Transformation für einen Greiferfinger.
@@ -285,72 +271,68 @@ class Scara:
         """
         Aktualisiert die Gelenkwinkel.
 
-        Der äussere Arm folgt dem inneren Arm.
-        Die Spindel folgt dem äusseren Arm.
-        Der Greifer folgt der Spindel.
+        Hierarchie: BaseFrame → Joint1Frame → Joint2Frame → ZFrame → ToolFrame (TCP)
+        Jeder Frame wird als eigenständige, in sich geschlossene Transformation aufgebaut.
         """
+        ix, iy, iz = self.origin_inner
+        ox, oy, oz = self.origin_outer
+        sx, sy, sz = self.origin_spindle
 
         # --------------------------------------------------------
-        # 1. Innerer Arm
+        # Joint1Frame: innerer Arm dreht um Gelenk 1
         # --------------------------------------------------------
-        t_inner = self._create_rotation(
-            self.origin_inner,
-            inner_angle
-        )
-
-        self.inner_arm_actor.SetUserTransform(t_inner)
-
-        # --------------------------------------------------------
-        # 2. Äusserer Arm folgt innerem Arm
-        # --------------------------------------------------------
-        t_outer = vtk.vtkTransform()
-        t_outer.PostMultiply()
-
-        t_outer.Concatenate(
-            self._create_rotation(self.origin_outer, outer_angle)
-        )
-
-        t_outer.Concatenate(t_inner)
-
-        self.outer_arm_actor.SetUserTransform(t_outer)
+        t_j1 = vtk.vtkTransform()
+        t_j1.PostMultiply()
+        t_j1.Translate(-ix, -iy, -iz)
+        t_j1.RotateZ(inner_angle)
+        t_j1.Translate(ix, iy, iz)
+        self.inner_arm_actor.SetUserTransform(t_j1)
 
         # --------------------------------------------------------
-        # 3. Spindel folgt äusserem Arm
+        # Joint2Frame: äußerer Arm dreht lokal um Gelenk 2,
+        #              dann folgt er Gelenk 1
         # --------------------------------------------------------
-        t_spindle = vtk.vtkTransform()
-        t_spindle.PostMultiply()
-
-        t_spindle.Concatenate(
-            self._create_rotation(self.origin_spindle, spindle_angle)
-        )
-
-        t_spindle.Concatenate(t_outer)
-        t_spindle.Translate(0.0, 0.0, z_height)
-
-        self.spindle_actor.SetUserTransform(t_spindle)
+        t_j2 = vtk.vtkTransform()
+        t_j2.PostMultiply()
+        t_j2.Translate(-ox, -oy, -oz)
+        t_j2.RotateZ(outer_angle)
+        t_j2.Translate(ox, oy, oz)
+        t_j2.Translate(-ix, -iy, -iz)
+        t_j2.RotateZ(inner_angle)
+        t_j2.Translate(ix, iy, iz)
+        self.outer_arm_actor.SetUserTransform(t_j2)
 
         # --------------------------------------------------------
-        # 4. Greifer folgt Spindel
+        # ToolFrame (TCP): Spindel dreht lokal, folgt J2 und J1,
+        #                  Z-Bewegung zuletzt im World/Base Frame
         # --------------------------------------------------------
-        self.gripper_mount_actor.SetUserTransform(t_spindle)
+        t_tcp = vtk.vtkTransform()
+        t_tcp.PostMultiply()
+        t_tcp.Translate(-sx, -sy, -sz)
+        t_tcp.RotateZ(spindle_angle)
+        t_tcp.Translate(sx, sy, sz)
+        t_tcp.Translate(-ox, -oy, -oz)
+        t_tcp.RotateZ(outer_angle)
+        t_tcp.Translate(ox, oy, oz)
+        t_tcp.Translate(-ix, -iy, -iz)
+        t_tcp.RotateZ(inner_angle)
+        t_tcp.Translate(ix, iy, iz)
+        t_tcp.Translate(0.0, 0.0, z_height)   # Z im World Frame (letzte Operation = Weltkoordinaten)
+        self.spindle_actor.SetUserTransform(t_tcp)
 
-        t_finger_l = self._create_gripper_finger_transform(
-            t_spindle,
-            -self.gripper_half_width
-        )
+        # --------------------------------------------------------
+        # Greifer folgt TCP-Frame
+        # --------------------------------------------------------
+        self.gripper_mount_actor.SetUserTransform(t_tcp)
 
-        t_finger_r = self._create_gripper_finger_transform(
-            t_spindle,
-            self.gripper_half_width
-        )
-
+        t_finger_l = self._create_gripper_finger_transform(t_tcp, -self.gripper_half_width)
+        t_finger_r = self._create_gripper_finger_transform(t_tcp,  self.gripper_half_width)
         self.gripper_finger_l_actor.SetUserTransform(t_finger_l)
         self.gripper_finger_r_actor.SetUserTransform(t_finger_r)
-
-        self._part_actor.SetUserTransform(t_spindle)
+        self._part_actor.SetUserTransform(t_tcp)
 
         # --------------------------------------------------------
-        # 5. Fenster aktualisieren
+        # Fenster aktualisieren
         # --------------------------------------------------------
         if render:
             try:

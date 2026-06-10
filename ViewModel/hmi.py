@@ -23,7 +23,7 @@ class Hmi:
             parent,
             bg="lightblue",
             width=400,
-            height=355,
+            height=370,
             relief="ridge",
             borderwidth=2
         )
@@ -40,9 +40,8 @@ class Hmi:
         # ---------------- EVENTS ----------------
 
         def on_coord_changed(event):
-            selected = combo_axis.get()
+            selected = self._combo_axis.get()
             self.hmiControl.CoordSystem = selected
-            # Switch axis labels: Joint mode shows joint names, Welt/Werkzeug shows X/Y
             if selected == "Joint":
                 self.LabelPos1.config(text="J1:")
                 self.LabelPos2.config(text="J2:")
@@ -53,10 +52,12 @@ class Hmi:
                 self.LabelPos2.config(text="Y :")
                 self.LabelPos3.config(text="Z :")
                 self.LabelPos4.config(text="R :")
+            self._update_mode_display()
 
         def on_mode_changed(event):
-            selected = combo_mode.get()
+            selected = self._combo_mode.get()
             self.hmiControl.OperationMode = 0 if selected == "Hand" else 1
+            self._update_mode_display()
 
         def on_start_click():
             self.hmiControl.Start = True
@@ -74,6 +75,7 @@ class Hmi:
             pct = int(float(val))
             self.hmiControl.OverridePercent = pct
             self._override_value_label.config(text=f"{pct}%")
+            self._update_mode_display()
 
         # ---------------- UI ----------------
 
@@ -86,24 +88,35 @@ class Hmi:
         titel.pack(pady=5)
 
         # Koordinatensystem
-        combo_axis = ttk.Combobox(
+        self._combo_axis = ttk.Combobox(
             self.root,
             values=["Welt", "Joint", "Werkzeug"],
             state="readonly"
         )
-        combo_axis.set("wählen")
-        combo_axis.bind("<<ComboboxSelected>>", on_coord_changed)
-        combo_axis.place(x=links, y=40)
+        self._combo_axis.set("wählen")
+        self._combo_axis.bind("<<ComboboxSelected>>", on_coord_changed)
+        self._combo_axis.place(x=links, y=40)
 
         # Betriebsart
-        combo_mode = ttk.Combobox(
+        self._combo_mode = ttk.Combobox(
             self.root,
             values=["Hand", "Automatisch"],
             state="readonly"
         )
-        combo_mode.set("wählen")
-        combo_mode.bind("<<ComboboxSelected>>", on_mode_changed)
-        combo_mode.place(x=rechts, y=40)
+        self._combo_mode.set("wählen")
+        self._combo_mode.bind("<<ComboboxSelected>>", on_mode_changed)
+        self._combo_mode.place(x=rechts, y=40)
+
+        # Aktiv-Modus-Anzeige (Betriebsart | Koordinatensystem | Override)
+        self.mode_label = tk.Label(
+            self.root,
+            text="",
+            bg="lightsalmon",
+            relief="sunken",
+            font=("Arial", 8),
+            anchor="center"
+        )
+        self.mode_label.place(x=links, y=68, width=380, height=20)
 
         # Achszeilen X / Y / Z / R
         self.LabelPos1, self.ButtonXPlus, self.ButtonXNeg, self.x_label = \
@@ -117,10 +130,10 @@ class Hmi:
 
         # Override-Schieberegler
         override_label = tk.Label(self.root, text="Override:", bg="lightblue")
-        override_label.place(x=links, y=220)
+        override_label.place(x=links, y=228)
 
         self._override_value_label = tk.Label(self.root, text="100%", bg="lightblue", width=5)
-        self._override_value_label.place(x=345, y=220)
+        self._override_value_label.place(x=345, y=228)
 
         override_slider = ttk.Scale(
             self.root,
@@ -130,7 +143,7 @@ class Hmi:
             command=on_override_changed
         )
         override_slider.set(100)
-        override_slider.place(x=90, y=220)
+        override_slider.place(x=90, y=228)
 
         # Statusanzeige
         self.status_label = tk.Label(
@@ -141,23 +154,52 @@ class Hmi:
             font=("Arial", 10, "bold"),
             anchor="center"
         )
-        self.status_label.place(x=links, y=255, width=380, height=28)
+        self.status_label.place(x=links, y=262, width=380, height=28)
 
         # Schaltflächen Start / Reset / Stop
         button_start = tk.Button(
             self.root, text="Start", width=10, command=on_start_click
         )
-        button_start.place(x=10, y=297)
+        button_start.place(x=10, y=305)
 
         button_reset = tk.Button(
             self.root, text="Reset", width=10, command=on_reset_click
         )
-        button_reset.place(x=140, y=297)
+        button_reset.place(x=140, y=305)
 
         button_stop = tk.Button(
             self.root, text="Stop", width=10, command=on_stop_click
         )
-        button_stop.place(x=270, y=297)
+        button_stop.place(x=270, y=305)
+
+        # Initialzustand der Modus-Anzeige setzen
+        self._update_mode_display()
+
+    # ============================================================
+    # MODUS-ANZEIGE
+    # ============================================================
+    def _update_mode_display(self):
+        """Aktualisiert die Modus-Anzeigeleiste (Betriebsart | Koordinaten | Override)."""
+        betrieb = self._combo_mode.get()
+        koord   = self._combo_axis.get()
+        ov      = self.hmiControl.OverridePercent
+
+        betrieb_text = betrieb if betrieb != "wählen" else "—"
+        koord_text   = koord   if koord   != "wählen" else "—"
+
+        unvollstaendig = betrieb == "wählen" or koord == "wählen"
+
+        if unvollstaendig:
+            bg = "lightsalmon"
+        elif betrieb == "Automatisch":
+            bg = "lightyellow"
+        else:
+            bg = "lightcyan"
+
+        self.mode_label.config(
+            text=f"{betrieb_text}  |  {koord_text}  |  Ov: {ov} %",
+            bg=bg
+        )
 
     # ============================================================
     # AXIS ROW HELPER
@@ -238,7 +280,7 @@ class Hmi:
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("HMI Test")
-    root.geometry("1250x400")
+    root.geometry("1250x415")
 
     frame1 = tk.Frame(root)
     frame1.pack(side="left", padx=5)
