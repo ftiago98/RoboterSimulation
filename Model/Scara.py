@@ -15,7 +15,7 @@ class Scara:
         self.acsAxis1 = Axis() # Gelenk 1
         self.acsAxis2 = Axis() # Gelenk 2
         self.acsAxis3 = Axis() # Hubachse
-        self.acsAxis4 = Axis() # Werkzeugdrehachse
+        self.acsAxis4 = Axis() # Werkzeugdrehachsee
 
         # Kartesische Achsen (MCS)
         self.mcsAxisX = Axis() # X Achse
