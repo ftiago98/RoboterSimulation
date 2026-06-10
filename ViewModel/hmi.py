@@ -1,3 +1,4 @@
+
 import sys
 sys.path.append('../ViewModel')
 
@@ -5,6 +6,7 @@ import tkinter as tk
 from tkinter import ttk
 from hmiControl import hmiControl
 from hmiState import hmiState
+from tkinter import ttk, messagebox
 
 class Hmi:
     def __init__(self,nameofHmi):
@@ -242,3 +244,14 @@ if __name__ == "__main__":
         f"Letzter Betriebsmodus: "
         f"{hmi.hmiControl.OperationMode}"
     )
+    
+def on_start_click():
+    self.hmiControl.Start = True
+    self.hmiControl.Stop = False
+
+    messagebox.showerror(
+        "Roboterfehler",
+        "Not-Halt betätigt!"
+    )
+
+    print("Start")
