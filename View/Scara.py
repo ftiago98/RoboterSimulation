@@ -43,13 +43,8 @@ class Scara:
         # --------------------------------------------------------
         if data_folder_path is None:
             cwd = os.getcwd()
-<<<<<<< HEAD
-            data_folder_path = os.path.join(cwd, "View", "Scara Modell")
+            data_folder_path = os.path.join(cwd, "View", "Scara_Modell")
             
-=======
-            data_folder_path = os.path.join(cwd, "View", "data")
-
->>>>>>> 1f7d26ccce9bc371353e4ee2ee10f05917adbc74
         base_file = os.path.join(data_folder_path, "Base.stl")
         inner_arm_file = os.path.join(data_folder_path, "InnerArm.stl")
         outer_arm_file = os.path.join(data_folder_path, "OuterArm.stl")
